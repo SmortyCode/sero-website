@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup — Listo</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Listo">l<span class="i" onclick="event.preventDefault();event.stopPropagation();this.classList.remove('drop');void this.offsetWidth;this.classList.add('drop');">ı</span>sto</a>
+    <div class="nav-links">
+      <a href="index.html" data-i18n="nav.back">Zurück zur Startseite</a>
+      <div class="nav-controls">
+        <select class="lang-select" id="lang" onchange="setLang(this.value)" aria-label="Language">
+          <option value="de">🇩🇪 DE</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="fr">🇫🇷 FR</option>
+        </select>
+        <button class="theme-switch" id="themeBtn" onclick="toggleTheme()" aria-label="Theme" role="switch"><span class="knob"></span></button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="wizard">
+  <div id="offline-banner" style="display:none; background:#fdecec; border:1px solid #f0b0b0; border-radius:12px; padding:12px 16px; font-size:13.5px; color:#8a1f1f; margin-bottom:24px;" data-i18n="ob.offline">
+    ⚠️ Der Listo-Server ist nicht erreichbar. Diese Seite muss über <code>http://localhost:8484</code> geöffnet werden.
+  </div>
+  <div class="progress" aria-label="Setup progress">
+    <span id="p1" class="done"></span><span id="p2"></span><span id="p3"></span><span id="p4"></span><span id="p5"></span>
+  </div>
+
+  <!-- Schritt 1: Konto -->
+  <div class="wstep active" id="step1">
+    <div class="eyebrow" data-i18n="s1.eyebrow">SCHRITT 1 VON 5 · KOSTENLOS</div>
+    <h2 data-i18n="s1.h">Erstell dein Konto.</h2>
+    <p data-i18n="s1.p">Nur deine E-Mail — kein Passwort nötig.</p>
+    <input class="input" type="email" placeholder="deine@email.de" data-i18n-ph="s1.ph" id="email">
+    <div class="info-box" data-i18n="s1.info">🔒 <strong>Kein Risiko:</strong> Bis Schritt 5 ist alles komplett kostenlos. Du richtest erst alles ein, testest Listo mit einem echten Foto — und entscheidest dich erst dann.</div>
+    <div class="status-ok" id="ok1" data-i18n="s1.ok">✓ Angemeldet.</div>
+    <div class="wizard-nav">
+      <span></span>
+      <button class="btn" id="signupBtn" onclick="doSignup()" data-i18n="s1.btn">Konto erstellen</button>
+    </div>
+  </div>
+
+  <!-- Schritt 2: eBay verbinden -->
+  <div class="wstep" id="step2">
+    <div class="eyebrow" data-i18n="s2.eyebrow">SCHRITT 2 VON 5 · 30 SEKUNDEN</div>
+    <h2 data-i18n="s2.h">Verbinde dein eBay-Konto.</h2>
+    <p data-i18n="s2.p">Du wirst zu eBay weitergeleitet, loggst dich dort ganz normal ein und erlaubst Listo, Angebote für dich zu erstellen.</p>
+    <button class="btn" onclick="openEbayConsent()" style="width: 100%; padding: 14px;" data-i18n="s2.btn">Mit eBay verbinden &nbsp;→</button>
+    <div class="info-box" data-i18n="s2.info">
+      <strong>Was Listo darf:</strong> Angebote erstellen und verwalten — nach deiner Bestätigung.<br>
+      <strong>Was Listo nie sieht:</strong> dein eBay-Passwort oder deine Zahlungsdaten.<br>
+      <strong>Was du NICHT brauchst:</strong> einen Developer-Account, API-Keys oder technisches Wissen.
+    </div>
+    <div id="paste-area" style="display:none;">
+      <p style="font-size:14px; color:var(--text-2); margin-bottom:8px;" data-i18n="s2.paste">Nach der Bestätigung bei eBay: Kopiere die komplette Adresse aus der Browser-Adresszeile und füge sie hier ein:</p>
+      <div class="code-field">
+        <input type="text" id="redirectUrl" placeholder="https://auth.ebay.com/…?code=…">
+        <button class="btn" onclick="submitEbayUrl()" data-i18n="s2.submit">Verbinden</button>
+      </div>
+    </div>
+    <div class="status-ok" id="ok2" data-i18n="s2.ok">✓ eBay-Konto verbunden.</div>
+    <div class="wizard-nav">
+      <button class="btn ghost" onclick="goto(1)" data-i18n="w.back">Zurück</button>
+      <button class="btn" id="next2" disabled onclick="goto(3)" data-i18n="w.next">Weiter</button>
+    </div>
+  </div>
+
+  <!-- Schritt 3: Versandadresse + eBay-Setup -->
+  <div class="wstep" id="step3">
+    <div class="eyebrow" data-i18n="s3.eyebrow">SCHRITT 3 VON 5 · 1 MINUTE</div>
+    <h2 data-i18n="s3.h">Deine Versandadresse.</h2>
+    <p data-i18n="s3.p">eBay braucht einen Versandstandort für deine Angebote — die Adresse wird nicht öffentlich angezeigt. Gleichzeitig werden deine Verkaufsrichtlinien eingerichtet.</p>
+    <input class="input" type="text" id="addrStreet" placeholder="Straße und Hausnummer" data-i18n-ph="s3.street">
+    <div style="display:flex; gap:10px;">
+      <input class="input" type="text" id="addrPlz" placeholder="PLZ" inputmode="numeric" maxlength="5" style="flex:0 0 110px;" data-i18n-ph="s3.plz">
+      <input class="input" type="text" id="addrCity" placeholder="Stadt" style="flex:1;" data-i18n-ph="s3.city">
+    </div>
+    <div class="info-box" data-i18n="s3.info">Hast du schon Verkaufsrichtlinien in deinem eBay-Konto, werden sie übernommen — es wird nichts doppelt angelegt.</div>
+    <div class="status-ok" id="ok3" data-i18n="s3.ok">✓ Richtlinien und Versandstandort sind eingerichtet.</div>
+    <div class="wizard-nav">
+      <button class="btn ghost" onclick="goto(2)" data-i18n="w.back">Zurück</button>
+      <button class="btn" id="setupBtn" onclick="submitEbaySetup()" data-i18n="s3.btn">Setup abschließen</button>
+    </div>
+  </div>
+
+  <!-- Schritt 4: Probelauf -->
+  <div class="wstep" id="step4">
+    <div class="eyebrow" data-i18n="s4.eyebrow">SCHRITT 4 VON 5 · DER BEWEIS</div>
+    <h2 data-i18n="s4.h">Mach den Probelauf.</h2>
+    <p data-i18n="s4.p">Öffne die App und scanne irgendeinen Artikel — du bekommst einen vollständigen Listing-Entwurf. <strong>Nichts geht live</strong> ohne deine Freigabe.</p>
+    <div class="info-box" data-i18n="s4.info">
+      📷 Foto an den Bot schicken → Titel, Beschreibung, Kategorie und Preisvorschlag kommen in ~30 Sekunden zurück.<br><br>
+      So siehst du <strong>vor dem ersten Cent</strong>, wie gut Listo dein Produkt versteht.
+    </div>
+    <div style="margin-top:18px; border:1px solid #d2d2d7; border-radius:var(--radius-sm); padding:14px 16px;">
+      <p style="margin:0 0 8px; font-size:14px;" data-i18n="s4.tgp"><strong>Optional:</strong> Verbinde Telegram, um auch per Chat-Bot zu listen. Schick dem Bot einfach diesen Code:</p>
+      <a class="btn ghost" id="tgLink" href="#" target="_blank" style="display:block; text-align:center; padding:12px; margin-bottom:8px;" data-i18n="s4.tgopen">Bot in Telegram öffnen &nbsp;↗</a>
+      <div class="code-field">
+        <input type="text" id="tgCode" value="…" readonly aria-label="Code">
+        <button class="btn ghost" onclick="copyCode(this)" data-i18n="s4.tgcopy">Kopieren</button>
+      </div>
+      <div class="status-ok" id="tgOk" data-i18n="s4.tgok">✓ Telegram verbunden.</div>
+    </div>
+    <div class="status-ok" id="ok4" data-i18n="s4.ok">✓ Setup komplett — Richtlinien und Versandstandort sind eingerichtet.</div>
+    <div class="wizard-nav">
+      <button class="btn ghost" onclick="goto(3)" data-i18n="w.back">Zurück</button>
+      <button class="btn" id="next4" onclick="goto(5)" data-i18n="s4.next">Weiter zur Planwahl</button>
+    </div>
+  </div>
+
+  <!-- Schritt 5: Plan wählen -->
+  <div class="wstep" id="step5">
+    <div class="eyebrow" data-i18n="s5.eyebrow">SCHRITT 5 VON 5 · 14 TAGE GRATIS</div>
+    <h2 data-i18n="s5.h">Wähle deinen Plan.</h2>
+    <p data-i18n="s5.p">Alles ist eingerichtet und getestet. Jeder Plan startet mit 14 Tagen Gratis-Zeitraum.</p>
+    <div style="display: grid; gap: 12px;">
+      <label style="display:flex; justify-content:space-between; align-items:center; border:1px solid #d2d2d7; border-radius:var(--radius-sm); padding:16px 18px; cursor:pointer;">
+        <span data-i18n="s5.p1"><strong>Starter</strong> — 30 Listings/Monat</span>
+        <span><strong>9,90 €</strong><span data-i18n="s5.mon1">/Mon.</span> <input type="radio" name="plan" value="starter"></span>
+      </label>
+      <label style="display:flex; justify-content:space-between; align-items:center; border:2px solid var(--accent); border-radius:var(--radius-sm); padding:16px 18px; cursor:pointer;">
+        <span data-i18n="s5.p2"><strong>Reseller</strong> — 200 Listings, Freisteller + Logo</span>
+        <span><strong>24,90 €</strong><span data-i18n="s5.mon2">/Mon.</span> <input type="radio" name="plan" value="reseller" checked></span>
+      </label>
+      <label style="display:flex; justify-content:space-between; align-items:center; border:1px solid #d2d2d7; border-radius:var(--radius-sm); padding:16px 18px; cursor:pointer;">
+        <span data-i18n="s5.p3"><strong>Shop</strong> — unbegrenzt, 3 Konten, Team</span>
+        <span><strong>59,90 €</strong><span data-i18n="s5.mon3">/Mon.</span> <input type="radio" name="plan" value="shop"></span>
+      </label>
+    </div>
+    <div class="info-box" data-i18n="s5.info">Monatlich kündbar · Erinnerung vor Abbuchung · Zahlung sicher über Stripe (Karte, PayPal, SEPA)</div>
+    <div class="wizard-nav">
+      <button class="btn ghost" onclick="goto(4)" data-i18n="w.back">Zurück</button>
+      <button class="btn" onclick="doCheckout()" data-i18n="s5.btn">14 Tage gratis starten</button>
+    </div>
+  </div>
+
+  <!-- Fertig -->
+  <div class="wstep" id="step6" style="text-align: center;">
+    <div style="font-size: 56px; margin-bottom: 16px;">🎉</div>
+    <h2 data-i18n="s6.h">Listo ist startklar.</h2>
+    <p id="doneText" data-i18n="s6.p">Schick deinem Bot das erste echte Foto — dein Listing wartet schon.</p>
+    <a class="btn" id="tgLink2" href="#" target="_blank" style="margin-top: 8px;" data-i18n="s6.tg">Telegram öffnen &nbsp;↗</a>
+    <p style="margin-top:16px;"><a href="app.html" data-i18n="s6.account">Zu meinem Konto →</a></p>
+  </div>
+</div>
+
+<script>
+const T = {
+en: {
+"nav.back":"Back to homepage",
+"ob.offline":"⚠️ The Listo server is unreachable. Open this page via <code>http://localhost:8484</code>.",
+"s1.eyebrow":"STEP 1 OF 5 · FREE","s1.h":"Create your account.","s1.p":"Just your email — no password needed.","s1.ph":"your@email.com",
+"s1.info":"🔒 <strong>Zero risk:</strong> everything up to step 5 is completely free. You set everything up, test Listo with a real photo — and decide only then.",
+"s1.ok":"✓ Signed in.","s1.btn":"Create account","s1.wait":"One moment…","s1.sent":"📬 Link sent — check your inbox!",
+"s2.eyebrow":"STEP 2 OF 5 · 30 SECONDS","s2.h":"Connect your eBay account.","s2.p":"You'll be taken to eBay, sign in as usual and allow Listo to create listings for you.",
+"s2.btn":"Connect with eBay &nbsp;→",
+"s2.info":"<strong>What Listo may do:</strong> create and manage listings — after your confirmation.<br><strong>What Listo never sees:</strong> your eBay password or payment details.<br><strong>What you DON'T need:</strong> a developer account, API keys or technical skills.",
+"s2.paste":"After confirming on eBay: copy the full address from the browser bar and paste it here:","s2.submit":"Connect","s2.ok":"✓ eBay account connected.",
+"s3.eyebrow":"STEP 3 OF 5 · 1 MINUTE","s3.h":"Your shipping address.","s3.p":"eBay needs a shipping location for your listings — the address is never shown publicly. Your selling policies are set up at the same time.",
+"s3.street":"Street and number","s3.plz":"ZIP","s3.city":"City",
+"s3.info":"If you already have selling policies in your eBay account, they are reused — nothing is created twice.",
+"s3.ok":"✓ Policies and shipping location are in place.","s3.btn":"Finish setup",
+"s4.eyebrow":"STEP 4 OF 5 · THE PROOF","s4.h":"Do the test run.","s4.p":"Open the app and scan any item — you get a complete listing draft. <strong>Nothing goes live</strong> without your approval.",
+"s4.tgp":"<strong>Optional:</strong> connect Telegram to list via chat bot too. Just send the bot this code:","s4.tgopen":"Open bot in Telegram &nbsp;↗","s4.tgcopy":"Copy","s4.tgok":"✓ Telegram connected.",
+"s4.info":"📷 Send a photo to the bot → title, description, category and price suggestion come back in ~30 seconds.<br><br>This way you see <strong>before the first cent</strong> how well Listo understands your product.",
+"s4.ok":"✓ Setup complete — policies and shipping location are in place.","s4.next":"Continue to plans",
+"s5.eyebrow":"STEP 5 OF 5 · 14 DAYS FREE","s5.h":"Choose your plan.","s5.p":"Everything is set up and tested. Every plan starts with a 14-day free period.",
+"s5.p1":"<strong>Starter</strong> — 30 listings/month","s5.p2":"<strong>Reseller</strong> — 200 listings, cutout + logo","s5.p3":"<strong>Shop</strong> — unlimited, 3 accounts, team",
+"s5.mon1":"/mo.","s5.mon2":"/mo.","s5.mon3":"/mo.",
+"s5.info":"Cancel monthly · Reminder before billing · Secure payment via Stripe (card, PayPal, SEPA)","s5.btn":"Start 14 days free",
+"s6.h":"Listo is ready.","s6.p":"Send your bot the first real photo — your listing is waiting.","s6.tg":"Open Telegram &nbsp;↗","s6.account":"Go to my account →",
+"w.back":"Back","w.next":"Next",
+"dyn.devdone":"Plan \"{plan}\" active (local test mode, no real payment). Send your bot the first photo!",
+"dyn.paiddone":"Payment received — plan \"{plan}\" is active. Send your bot the first photo!",
+"dyn.copied":"Copied ✓","dyn.connectfail":"Connection failed — please try again.","dyn.checkoutfail":"Checkout error."
+},
+es: {
+"nav.back":"Volver al inicio",
+"ob.offline":"⚠️ El servidor de Listo no responde. Abre esta página vía <code>http://localhost:8484</code>.",
+"s1.eyebrow":"PASO 1 DE 5 · GRATIS","s1.h":"Crea tu cuenta.","s1.p":"Solo tu e-mail — sin contraseña.","s1.ph":"tu@email.com",
+"s1.info":"🔒 <strong>Sin riesgo:</strong> hasta el paso 5 todo es completamente gratis. Lo configuras todo, pruebas Listo con una foto real — y decides solo entonces.",
+"s1.ok":"✓ Sesión iniciada.","s1.btn":"Crear cuenta","s1.wait":"Un momento…","s1.sent":"📬 Enlace enviado — ¡revisa tu correo!",
+"s2.eyebrow":"PASO 2 DE 5 · 30 SEGUNDOS","s2.h":"Conecta tu cuenta de eBay.","s2.p":"Irás a eBay, inicias sesión como siempre y permites que Listo cree anuncios por ti.",
+"s2.btn":"Conectar con eBay &nbsp;→",
+"s2.info":"<strong>Lo que Listo puede hacer:</strong> crear y gestionar anuncios — tras tu confirmación.<br><strong>Lo que Listo nunca ve:</strong> tu contraseña de eBay ni tus datos de pago.<br><strong>Lo que NO necesitas:</strong> cuenta de desarrollador, claves API ni conocimientos técnicos.",
+"s2.paste":"Tras confirmar en eBay: copia la dirección completa de la barra del navegador y pégala aquí:","s2.submit":"Conectar","s2.ok":"✓ Cuenta de eBay conectada.",
+"s3.eyebrow":"PASO 3 DE 5 · 1 MINUTO","s3.h":"Tu dirección de envío.","s3.p":"eBay necesita una ubicación de envío para tus anuncios — la dirección nunca se muestra públicamente. Tus políticas de venta se configuran al mismo tiempo.",
+"s3.street":"Calle y número","s3.plz":"CP","s3.city":"Ciudad",
+"s3.info":"Si ya tienes políticas de venta en tu cuenta de eBay, se reutilizan — no se crea nada dos veces.",
+"s3.ok":"✓ Políticas y ubicación de envío configuradas.","s3.btn":"Terminar configuración",
+"s4.eyebrow":"PASO 4 DE 5 · LA PRUEBA","s4.h":"Haz la prueba.","s4.p":"Abre la app y escanea cualquier artículo — recibirás un borrador completo. <strong>Nada se publica</strong> sin tu aprobación.",
+"s4.tgp":"<strong>Opcional:</strong> conecta Telegram para publicar también por chat. Envía este código al bot:","s4.tgopen":"Abrir bot en Telegram &nbsp;↗","s4.tgcopy":"Copiar","s4.tgok":"✓ Telegram conectado.",
+"s4.info":"📷 Envía una foto al bot → título, descripción, categoría y precio sugerido en ~30 segundos.<br><br>Así ves <strong>antes del primer céntimo</strong> lo bien que Listo entiende tu producto.",
+"s4.ok":"✓ Configuración completa — políticas y ubicación de envío listas.","s4.next":"Continuar a los planes",
+"s5.eyebrow":"PASO 5 DE 5 · 14 DÍAS GRATIS","s5.h":"Elige tu plan.","s5.p":"Todo está configurado y probado. Cada plan empieza con 14 días gratis.",
+"s5.p1":"<strong>Starter</strong> — 30 anuncios/mes","s5.p2":"<strong>Reseller</strong> — 200 anuncios, recorte + logo","s5.p3":"<strong>Shop</strong> — ilimitado, 3 cuentas, equipo",
+"s5.mon1":"/mes","s5.mon2":"/mes","s5.mon3":"/mes",
+"s5.info":"Cancelación mensual · Aviso antes del cobro · Pago seguro vía Stripe (tarjeta, PayPal, SEPA)","s5.btn":"Empezar 14 días gratis",
+"s6.h":"Listo está listo.","s6.p":"Envía a tu bot la primera foto real — tu anuncio te espera.","s6.tg":"Abrir Telegram &nbsp;↗","s6.account":"Ir a mi cuenta →",
+"w.back":"Atrás","w.next":"Siguiente",
+"dyn.devdone":"Plan «{plan}» activo (modo de prueba local, sin pago real). ¡Envía la primera foto a tu bot!",
+"dyn.paiddone":"Pago recibido — el plan «{plan}» está activo. ¡Envía la primera foto a tu bot!",
+"dyn.copied":"Copiado ✓","dyn.connectfail":"Conexión fallida — inténtalo de nuevo.","dyn.checkoutfail":"Error en el pago."
+},
+it: {
+"nav.back":"Torna alla home",
+"ob.offline":"⚠️ Il server Listo non risponde. Apri questa pagina via <code>http://localhost:8484</code>.",
+"s1.eyebrow":"PASSO 1 DI 5 · GRATIS","s1.h":"Crea il tuo account.","s1.p":"Solo la tua e-mail — nessuna password.","s1.ph":"tua@email.com",
+"s1.info":"🔒 <strong>Zero rischi:</strong> fino al passo 5 è tutto completamente gratuito. Configuri tutto, provi Listo con una foto vera — e decidi solo dopo.",
+"s1.ok":"✓ Accesso effettuato.","s1.btn":"Crea account","s1.wait":"Un attimo…","s1.sent":"📬 Link inviato — controlla la posta!",
+"s2.eyebrow":"PASSO 2 DI 5 · 30 SECONDI","s2.h":"Collega il tuo account eBay.","s2.p":"Verrai portato su eBay, accedi come al solito e permetti a Listo di creare annunci per te.",
+"s2.btn":"Collega con eBay &nbsp;→",
+"s2.info":"<strong>Cosa può fare Listo:</strong> creare e gestire annunci — dopo la tua conferma.<br><strong>Cosa Listo non vede mai:</strong> la tua password eBay o i dati di pagamento.<br><strong>Cosa NON ti serve:</strong> account sviluppatore, chiavi API o competenze tecniche.",
+"s2.paste":"Dopo la conferma su eBay: copia l'indirizzo completo dalla barra del browser e incollalo qui:","s2.submit":"Collega","s2.ok":"✓ Account eBay collegato.",
+"s3.eyebrow":"PASSO 3 DI 5 · 1 MINUTO","s3.h":"Il tuo indirizzo di spedizione.","s3.p":"eBay ha bisogno di una sede di spedizione per i tuoi annunci — l'indirizzo non viene mai mostrato pubblicamente. Le tue regole di vendita vengono configurate allo stesso tempo.",
+"s3.street":"Via e numero civico","s3.plz":"CAP","s3.city":"Città",
+"s3.info":"Se hai già regole di vendita nel tuo account eBay, vengono riutilizzate — nulla viene creato due volte.",
+"s3.ok":"✓ Regole e sede di spedizione configurate.","s3.btn":"Completa la configurazione",
+"s4.eyebrow":"PASSO 4 DI 5 · LA PROVA","s4.h":"Fai il giro di prova.","s4.p":"Apri l'app e scansiona un articolo qualsiasi — riceverai una bozza completa. <strong>Nulla va online</strong> senza la tua approvazione.",
+"s4.tgp":"<strong>Facoltativo:</strong> collega Telegram per pubblicare anche via chat. Invia questo codice al bot:","s4.tgopen":"Apri il bot su Telegram &nbsp;↗","s4.tgcopy":"Copia","s4.tgok":"✓ Telegram collegato.",
+"s4.info":"📷 Invia una foto al bot → titolo, descrizione, categoria e prezzo suggerito in ~30 secondi.<br><br>Così vedi <strong>prima del primo centesimo</strong> quanto bene Listo capisce il tuo prodotto.",
+"s4.ok":"✓ Configurazione completa — regole e sede di spedizione pronte.","s4.next":"Continua ai piani",
+"s5.eyebrow":"PASSO 5 DI 5 · 14 GIORNI GRATIS","s5.h":"Scegli il tuo piano.","s5.p":"Tutto è configurato e testato. Ogni piano parte con 14 giorni gratuiti.",
+"s5.p1":"<strong>Starter</strong> — 30 annunci/mese","s5.p2":"<strong>Reseller</strong> — 200 annunci, scontorno + logo","s5.p3":"<strong>Shop</strong> — illimitato, 3 account, team",
+"s5.mon1":"/mese","s5.mon2":"/mese","s5.mon3":"/mese",
+"s5.info":"Disdetta mensile · Promemoria prima dell'addebito · Pagamento sicuro via Stripe (carta, PayPal, SEPA)","s5.btn":"Inizia 14 giorni gratis",
+"s6.h":"Listo è pronto.","s6.p":"Invia al tuo bot la prima foto vera — il tuo annuncio ti aspetta.","s6.tg":"Apri Telegram &nbsp;↗","s6.account":"Vai al mio account →",
+"w.back":"Indietro","w.next":"Avanti",
+"dyn.devdone":"Piano «{plan}» attivo (modalità test locale, nessun pagamento reale). Invia la prima foto al tuo bot!",
+"dyn.paiddone":"Pagamento ricevuto — il piano «{plan}» è attivo. Invia la prima foto al tuo bot!",
+"dyn.copied":"Copiato ✓","dyn.connectfail":"Connessione fallita — riprova.","dyn.checkoutfail":"Errore nel pagamento."
+},
+fr: {
+"nav.back":"Retour à l'accueil",
+"ob.offline":"⚠️ Le serveur Listo est injoignable. Ouvrez cette page via <code>http://localhost:8484</code>.",
+"s1.eyebrow":"ÉTAPE 1 SUR 5 · GRATUIT","s1.h":"Créez votre compte.","s1.p":"Juste votre e-mail — pas de mot de passe.","s1.ph":"votre@email.com",
+"s1.info":"🔒 <strong>Zéro risque :</strong> jusqu'à l'étape 5, tout est entièrement gratuit. Vous configurez tout, testez Listo avec une vraie photo — et ne décidez qu'ensuite.",
+"s1.ok":"✓ Connecté.","s1.btn":"Créer le compte","s1.wait":"Un instant…","s1.sent":"📬 Lien envoyé — vérifiez votre boîte mail !",
+"s2.eyebrow":"ÉTAPE 2 SUR 5 · 30 SECONDES","s2.h":"Connectez votre compte eBay.","s2.p":"Vous serez redirigé vers eBay, connectez-vous normalement et autorisez Listo à créer des annonces pour vous.",
+"s2.btn":"Connecter avec eBay &nbsp;→",
+"s2.info":"<strong>Ce que Listo peut faire :</strong> créer et gérer des annonces — après votre confirmation.<br><strong>Ce que Listo ne voit jamais :</strong> votre mot de passe eBay ou vos données de paiement.<br><strong>Ce dont vous N'AVEZ PAS besoin :</strong> compte développeur, clés API ou compétences techniques.",
+"s2.paste":"Après confirmation sur eBay : copiez l'adresse complète de la barre du navigateur et collez-la ici :","s2.submit":"Connecter","s2.ok":"✓ Compte eBay connecté.",
+"s3.eyebrow":"ÉTAPE 3 SUR 5 · 1 MINUTE","s3.h":"Votre adresse d'expédition.","s3.p":"eBay a besoin d'un lieu d'expédition pour vos annonces — l'adresse n'est jamais affichée publiquement. Vos règles de vente sont configurées en même temps.",
+"s3.street":"Rue et numéro","s3.plz":"Code postal","s3.city":"Ville",
+"s3.info":"Si vous avez déjà des règles de vente dans votre compte eBay, elles sont réutilisées — rien n'est créé en double.",
+"s3.ok":"✓ Règles et lieu d'expédition en place.","s3.btn":"Terminer la configuration",
+"s4.eyebrow":"ÉTAPE 4 SUR 5 · LA PREUVE","s4.h":"Faites l'essai.","s4.p":"Ouvrez l'app et scannez n'importe quel article — vous recevrez un brouillon complet. <strong>Rien n'est publié</strong> sans votre validation.",
+"s4.tgp":"<strong>Facultatif :</strong> connectez Telegram pour publier aussi par chat. Envoyez ce code au bot :","s4.tgopen":"Ouvrir le bot dans Telegram &nbsp;↗","s4.tgcopy":"Copier","s4.tgok":"✓ Telegram connecté.",
+"s4.info":"📷 Envoyez une photo au bot → titre, description, catégorie et prix suggéré en ~30 secondes.<br><br>Vous voyez ainsi <strong>avant le premier centime</strong> à quel point Listo comprend votre produit.",
+"s4.ok":"✓ Configuration terminée — règles et lieu d'expédition en place.","s4.next":"Continuer vers les forfaits",
+"s5.eyebrow":"ÉTAPE 5 SUR 5 · 14 JOURS GRATUITS","s5.h":"Choisissez votre forfait.","s5.p":"Tout est configuré et testé. Chaque forfait commence par 14 jours gratuits.",
+"s5.p1":"<strong>Starter</strong> — 30 annonces/mois","s5.p2":"<strong>Reseller</strong> — 200 annonces, détourage + logo","s5.p3":"<strong>Shop</strong> — illimité, 3 comptes, équipe",
+"s5.mon1":"/mois","s5.mon2":"/mois","s5.mon3":"/mois",
+"s5.info":"Résiliable chaque mois · Rappel avant prélèvement · Paiement sécurisé via Stripe (carte, PayPal, SEPA)","s5.btn":"Commencer 14 jours gratuits",
+"s6.h":"Listo est prêt.","s6.p":"Envoyez à votre bot la première vraie photo — votre annonce vous attend.","s6.tg":"Ouvrir Telegram &nbsp;↗","s6.account":"Vers mon compte →",
+"w.back":"Retour","w.next":"Suivant",
+"dyn.devdone":"Forfait « {plan} » actif (mode test local, aucun paiement réel). Envoyez la première photo à votre bot !",
+"dyn.paiddone":"Paiement reçu — le forfait « {plan} » est actif. Envoyez la première photo à votre bot !",
+"dyn.copied":"Copié ✓","dyn.connectfail":"Échec de la connexion — réessayez.","dyn.checkoutfail":"Erreur de paiement."
+}
+};
+const de = {
+"s1.wait":"Einen Moment…","s1.sent":"📬 Link verschickt — check dein Postfach!",
+"dyn.devdone":"Plan „{plan}“ aktiv (lokaler Test-Modus, keine echte Zahlung). Schick deinem Bot das erste Foto!",
+"dyn.paiddone":"Zahlung erhalten — Plan „{plan}“ ist aktiv. Schick deinem Bot das erste Foto!",
+"dyn.copied":"Kopiert ✓","dyn.connectfail":"Verbindung fehlgeschlagen — bitte erneut versuchen.","dyn.checkoutfail":"Fehler beim Checkout."
+};
+document.querySelectorAll("[data-i18n]").forEach(el => { de[el.dataset.i18n] = el.innerHTML; });
+document.querySelectorAll("[data-i18n-ph]").forEach(el => { de[el.dataset.i18nPh] = el.placeholder; });
+T.de = de;
+let L = de;
+
+function setLang(lang) {
+  L = T[lang] || T.de;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (L[el.dataset.i18n] !== undefined) el.innerHTML = L[el.dataset.i18n];
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    if (L[el.dataset.i18nPh] !== undefined) el.placeholder = L[el.dataset.i18nPh];
+  });
+  document.documentElement.lang = lang;
+  localStorage.setItem("listo-lang", lang);
+  document.getElementById("lang").value = lang;
+}
+
+let me = null;
+let pollTimer = null;
+
+async function api(path, options) {
+  const resp = await fetch(path, Object.assign({
+    headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+  }, options));
+  return { status: resp.status, data: await resp.json().catch(() => ({})) };
+}
+
+function setProgress(n) {
+  for (let i = 1; i <= 5; i++) document.getElementById("p" + i).classList.toggle("done", i <= n);
+}
+
+function goto(n) {
+  document.querySelectorAll(".wstep").forEach(s => s.classList.remove("active"));
+  document.getElementById("step" + n).classList.add("active");
+  setProgress(Math.min(n, 5));
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (n === 4) prepareTelegramStep();
+}
+
+async function refreshMe() {
+  try {
+    const { status, data } = await api("/api/me");
+    if (status === 200) { me = data; return me; }
+  } catch (e) {
+    document.getElementById("offline-banner").style.display = "block";
+  }
+  me = null;
+  return null;
+}
+
+async function doSignup() {
+  const email = document.getElementById("email").value.trim();
+  if (!email.includes("@")) { document.getElementById("email").style.borderColor = "#e24b4a"; return; }
+  const btn = document.getElementById("signupBtn");
+  btn.disabled = true; btn.textContent = L["s1.wait"];
+  try {
+    const { data } = await api("/api/signup", { method: "POST", body: JSON.stringify({ email }) });
+    if (data.dev_login_url) {
+      window.location = data.dev_login_url;
+    } else {
+      btn.textContent = L["s1.sent"];
+    }
+  } catch (e) {
+    document.getElementById("offline-banner").style.display = "block";
+    btn.disabled = false; btn.innerHTML = L["s1.btn"];
+  }
+}
+
+function openEbayConsent() {
+  document.getElementById("paste-area").style.display = "block";
+  window.open("/connect/ebay", "_blank");
+}
+
+async function submitEbayUrl() {
+  const url = document.getElementById("redirectUrl").value.trim();
+  const { status, data } = await api("/api/ebay-redirect", { method: "POST", body: JSON.stringify({ url }) });
+  if (status === 200) {
+    document.getElementById("ok2").classList.add("show");
+    document.getElementById("next2").disabled = false;
+    document.getElementById("paste-area").style.display = "none";
+  } else {
+    alert(data.error || L["dyn.connectfail"]);
+  }
+}
+
+async function submitEbaySetup() {
+  const btn = document.getElementById("setupBtn");
+  const body = {
+    street: document.getElementById("addrStreet").value.trim(),
+    postal_code: document.getElementById("addrPlz").value.trim(),
+    city: document.getElementById("addrCity").value.trim(),
+  };
+  btn.disabled = true;
+  try {
+    const { status, data } = await api("/api/ebay-setup", { method: "POST", body: JSON.stringify(body) });
+    if (status === 200) {
+      document.getElementById("ok3").classList.add("show");
+      await refreshMe();
+      setTimeout(() => goto(4), 600);
+      return;
+    }
+    alert(data.error || L["dyn.connectfail"]);
+  } finally { btn.disabled = false; }
+}
+
+async function prepareTelegramStep() {
+  if (me && me.bot_username) {
+    document.getElementById("tgLink").href = "https://t.me/" + me.bot_username;
+    document.getElementById("tgLink2").href = "https://t.me/" + me.bot_username;
+  }
+  if (me && me.telegram_linked) {
+    document.getElementById("tgOk").classList.add("show");
+    document.getElementById("tgCode").parentElement.style.display = "none";
+    return;
+  }
+  const { status, data } = await api("/api/telegram-code", { method: "POST" });
+  if (status !== 200) return;
+  document.getElementById("tgCode").value = data.code;
+  document.getElementById("tgLink").href = data.url;
+  document.getElementById("tgLink2").href = data.url;
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    await refreshMe();
+    if (me && me.telegram_linked) {
+      document.getElementById("tgOk").classList.add("show");
+      clearInterval(pollTimer);
+    }
+  }, 3000);
+}
+
+function copyCode(btn) {
+  navigator.clipboard.writeText(document.getElementById("tgCode").value);
+  btn.textContent = L["dyn.copied"];
+}
+
+async function doCheckout() {
+  const plan = document.querySelector("input[name=plan]:checked").value;
+  const { status, data } = await api("/api/checkout", { method: "POST", body: JSON.stringify({ plan }) });
+  if (status !== 200) { alert(data.error || L["dyn.checkoutfail"]); return; }
+  if (data.checkout_url) { window.location = data.checkout_url; return; }
+  if (data.dev) {
+    document.getElementById("doneText").textContent = L["dyn.devdone"].replace("{plan}", plan);
+  }
+  goto(6);
+}
+
+async function init() {
+  await refreshMe();
+  if (!me) { goto(1); return; }
+  const params = new URLSearchParams(location.search);
+  if (params.get("paid") === "1" && params.get("session_id")) {
+    history.replaceState(null, "", "onboarding.html");
+    const { status, data } = await api("/api/checkout-confirm", {
+      method: "POST", body: JSON.stringify({ session_id: params.get("session_id") }),
+    });
+    if (status === 200) {
+      document.getElementById("doneText").textContent = L["dyn.paiddone"].replace("{plan}", data.plan);
+      goto(6);
+      return;
+    }
+    alert(data.error || L["dyn.checkoutfail"]);
+  }
+  document.getElementById("ok1").classList.add("show");
+  if (me.ebay_connected) {
+    document.getElementById("ok2").classList.add("show");
+    document.getElementById("next2").disabled = false;
+  }
+  if (me.setup_ready) {
+    document.getElementById("ok3").classList.add("show");
+    document.getElementById("ok4").classList.add("show");
+  }
+  if (me.telegram_linked) document.getElementById("tgOk").classList.add("show");
+  if (me.bot_username) document.getElementById("tgLink2").href = "https://t.me/" + me.bot_username;
+  if (!me.ebay_connected) goto(2);
+  else if (!me.setup_ready) goto(3);
+  else goto(5);
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("listo-theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+applyTheme(localStorage.getItem("listo-theme")
+  || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+setLang(localStorage.getItem("listo-lang") || "en");
+init();
+</script>
+
+<script>
+fetch("/api/event", {
+  method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+  body: JSON.stringify({ path: location.pathname, ref: document.referrer, lang: navigator.language }),
+}).catch(() => {});
+</script>
+<script src="i18n-admin.js?v=1"></script>
+<script src="listo-fx.js?v=2"></script>
+</body>
+</html>

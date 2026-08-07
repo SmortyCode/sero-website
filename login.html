@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Listo</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Listo">l<span class="i" onclick="event.preventDefault();event.stopPropagation();this.classList.remove('drop');void this.offsetWidth;this.classList.add('drop');">ı</span>sto</a>
+    <div class="nav-links">
+      <a href="onboarding.html" data-i18n="nav.signup">Noch kein Konto? Kostenlos starten</a>
+      <div class="nav-controls">
+        <select class="lang-select" id="lang" onchange="setLang(this.value)" aria-label="Language">
+          <option value="de">🇩🇪 DE</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="fr">🇫🇷 FR</option>
+        </select>
+        <button class="theme-switch" id="themeBtn" onclick="toggleTheme()" aria-label="Theme" role="switch"><span class="knob"></span></button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="wizard" style="max-width: 420px; padding-top: 96px;">
+
+  <div class="wstep active" id="login-step1">
+    <h2 style="text-align:center;" data-i18n="l1.h">Willkommen zurück.</h2>
+    <p style="text-align:center;" data-i18n="l1.p">Melde dich mit deiner E-Mail an — wir schicken dir einen Anmelde-Code.</p>
+    <input class="input" type="email" placeholder="deine@email.de" data-i18n-ph="l1.ph" id="identifier" autofocus>
+    <button class="btn" style="width:100%; padding: 14px;" onclick="requestCode()" data-i18n="l1.btn">Code anfordern</button>
+    <div class="info-box" style="text-align:center;" data-i18n="l1.info">🔒 Passwortlos &amp; sicher: Der Code ist 15 Minuten gültig und funktioniert nur einmal.</div>
+    <p id="err1" style="color:#c0392b; font-size:14px; text-align:center; display:none;"></p>
+  </div>
+
+  <div class="wstep" id="login-step2">
+    <div style="font-size: 44px; text-align:center; margin-bottom: 8px;">📬</div>
+    <h2 style="text-align:center;" data-i18n="l2.h">Code eingeben.</h2>
+    <p style="text-align:center;"><span data-i18n="l2.p">Wir haben einen Anmelde-Code geschickt an</span> <strong id="sent-to">…</strong></p>
+    <input class="input" type="text" placeholder="L-123456" id="code" style="text-align:center; font-family:ui-monospace,monospace; font-size:20px; letter-spacing:3px;">
+    <button class="btn" style="width:100%; padding: 14px;" onclick="verifyCode()" data-i18n="l2.btn">Anmelden</button>
+    <p id="devNote" style="font-size:12px; color:var(--text-3); text-align:center; margin-top:10px; display:none;" data-i18n="l2.dev">🧪 Lokaler Test-Modus: Code wurde automatisch eingetragen.</p>
+    <p id="err2" style="color:#c0392b; font-size:14px; text-align:center; display:none;"></p>
+    <p style="font-size: 13px; color: var(--text-3); margin-top: 16px; text-align:center;"><span data-i18n="l2.again">Nichts angekommen? Spam prüfen oder</span> <a href="#" onclick="back(); return false;" data-i18n="l2.retry">erneut anfordern</a>.</p>
+  </div>
+</div>
+
+<script>
+const T = {
+en: {
+"nav.signup":"No account yet? Start for free",
+"l1.h":"Welcome back.","l1.p":"Sign in with your email — we'll send you a sign-in code.","l1.ph":"your@email.com","l1.btn":"Request code",
+"l1.info":"🔒 Passwordless &amp; secure: the code is valid for 15 minutes and works only once.",
+"l2.h":"Enter your code.","l2.p":"We sent a sign-in code to","l2.btn":"Sign in",
+"l2.dev":"🧪 Local test mode: code was filled in automatically.",
+"l2.again":"Nothing arrived? Check spam or","l2.retry":"request again",
+"err.fail":"Sign-in failed.","err.code":"Invalid code."
+},
+es: {
+"nav.signup":"¿Sin cuenta? Empieza gratis",
+"l1.h":"Bienvenido de nuevo.","l1.p":"Inicia sesión con tu e-mail — te enviamos un código de acceso.","l1.ph":"tu@email.com","l1.btn":"Solicitar código",
+"l1.info":"🔒 Sin contraseña y seguro: el código vale 15 minutos y solo funciona una vez.",
+"l2.h":"Introduce el código.","l2.p":"Hemos enviado un código a","l2.btn":"Iniciar sesión",
+"l2.dev":"🧪 Modo de prueba local: el código se rellenó automáticamente.",
+"l2.again":"¿No llegó nada? Revisa el spam o","l2.retry":"solicítalo de nuevo",
+"err.fail":"Error al iniciar sesión.","err.code":"Código no válido."
+},
+it: {
+"nav.signup":"Niente account? Inizia gratis",
+"l1.h":"Bentornato.","l1.p":"Accedi con la tua e-mail — ti inviamo un codice di accesso.","l1.ph":"tua@email.com","l1.btn":"Richiedi codice",
+"l1.info":"🔒 Senza password e sicuro: il codice vale 15 minuti e funziona una sola volta.",
+"l2.h":"Inserisci il codice.","l2.p":"Abbiamo inviato un codice a","l2.btn":"Accedi",
+"l2.dev":"🧪 Modalità test locale: codice inserito automaticamente.",
+"l2.again":"Non è arrivato nulla? Controlla lo spam o","l2.retry":"richiedilo di nuovo",
+"err.fail":"Accesso non riuscito.","err.code":"Codice non valido."
+},
+fr: {
+"nav.signup":"Pas de compte ? Commencez gratuitement",
+"l1.h":"Bon retour.","l1.p":"Connectez-vous avec votre e-mail — nous vous envoyons un code de connexion.","l1.ph":"votre@email.com","l1.btn":"Demander le code",
+"l1.info":"🔒 Sans mot de passe et sécurisé : le code est valable 15 minutes et ne fonctionne qu'une fois.",
+"l2.h":"Saisissez le code.","l2.p":"Nous avons envoyé un code à","l2.btn":"Se connecter",
+"l2.dev":"🧪 Mode test local : le code a été rempli automatiquement.",
+"l2.again":"Rien reçu ? Vérifiez le spam ou","l2.retry":"redemandez-le",
+"err.fail":"Échec de la connexion.","err.code":"Code invalide."
+}
+};
+const de = { "err.fail":"Anmeldung fehlgeschlagen.", "err.code":"Code ungültig." };
+document.querySelectorAll("[data-i18n]").forEach(el => { de[el.dataset.i18n] = el.innerHTML; });
+document.querySelectorAll("[data-i18n-ph]").forEach(el => { de[el.dataset.i18nPh] = el.placeholder; });
+T.de = de;
+let L = de;
+
+function setLang(lang) {
+  L = T[lang] || T.de;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (L[el.dataset.i18n] !== undefined) el.innerHTML = L[el.dataset.i18n];
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    if (L[el.dataset.i18nPh] !== undefined) el.placeholder = L[el.dataset.i18nPh];
+  });
+  document.documentElement.lang = lang;
+  localStorage.setItem("listo-lang", lang);
+  document.getElementById("lang").value = lang;
+}
+
+async function api(path, body) {
+  const resp = await fetch(path, {
+    method: "POST", credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return { status: resp.status, data: await resp.json().catch(() => ({})) };
+}
+
+function show(stepId) {
+  document.querySelectorAll(".wstep").forEach(s => s.classList.remove("active"));
+  document.getElementById(stepId).classList.add("active");
+}
+
+async function requestCode() {
+  const identifier = document.getElementById("identifier").value.trim();
+  if (!identifier) return;
+  const { status, data } = await api("/api/login-code", { identifier });
+  const err = document.getElementById("err1");
+  if (status !== 200) {
+    err.textContent = data.error || L["err.fail"];
+    err.style.display = "block";
+    return;
+  }
+  err.style.display = "none";
+  document.getElementById("sent-to").textContent = identifier;
+  if (data.dev_code) {
+    document.getElementById("code").value = data.dev_code;
+    document.getElementById("devNote").style.display = "block";
+  }
+  show("login-step2");
+}
+
+async function verifyCode() {
+  const identifier = document.getElementById("identifier").value.trim();
+  const code = document.getElementById("code").value.trim();
+  const { status, data } = await api("/api/login-verify", { identifier, code });
+  const err = document.getElementById("err2");
+  if (status !== 200) {
+    err.textContent = data.error || L["err.code"];
+    err.style.display = "block";
+    return;
+  }
+  window.location = "app.html";
+}
+
+function back() { show("login-step1"); }
+
+document.getElementById("code").addEventListener("keydown", e => { if (e.key === "Enter") verifyCode(); });
+document.getElementById("identifier").addEventListener("keydown", e => { if (e.key === "Enter") requestCode(); });
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("listo-theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+applyTheme(localStorage.getItem("listo-theme")
+  || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+setLang(localStorage.getItem("listo-lang") || "en");
+</script>
+
+<script>
+fetch("/api/event", {
+  method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+  body: JSON.stringify({ path: location.pathname, ref: document.referrer, lang: navigator.language }),
+}).catch(() => {});
+</script>
+<script src="i18n-admin.js?v=1"></script>
+<script src="listo-fx.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verbindungen — Listo</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css?v=15">
+<style>
+/* Kritisches Layout inline — Seite sieht auch ohne CSS-Cache korrekt aus */
+.conn-wrap { max-width: 480px; margin: 0 auto; padding: 64px 24px 96px; }
+.conn-head { text-align: center; margin-bottom: 36px; }
+.conn-head h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+.conn-head p { color: var(--text-3, #86868b); font-size: 14px; margin: 0; }
+.conn-card {
+  background: var(--bg, #fff); border: 1px solid rgba(128,128,128,0.22);
+  border-radius: 18px; padding: 24px; margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.conn-card:hover { border-color: rgba(128,128,128,0.40); }
+.conn-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.conn-icon {
+  width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.conn-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; flex: 1; }
+.conn-desc { font-size: 14px; color: var(--text-2, #6e6e73); line-height: 1.55; margin: 0 0 16px; }
+.conn-status {
+  font-size: 12.5px; font-weight: 600; padding: 5px 12px; border-radius: 980px;
+  background: rgba(128,128,128,0.12); color: var(--text-2, #6e6e73);
+}
+.conn-status.on { background: #e8f6ef; color: #0a6b4d; }
+[data-theme="dark"] .conn-status.on { background: #0e2a1f; color: #62caa0; }
+.conn-btn {
+  display: block; width: 100%; text-align: center; cursor: pointer;
+  font-size: 15px; font-weight: 500; font-family: inherit;
+  padding: 13px 20px; border-radius: 12px; border: none;
+  background: var(--accent, #75aae7); color: #fff; transition: filter 0.15s;
+}
+.conn-btn:hover { filter: brightness(0.93); }
+.conn-btn.secondary {
+  background: transparent; color: var(--accent, #75aae7);
+  border: 1px solid rgba(128,128,128,0.30);
+}
+.conn-expand { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(128,128,128,0.18); }
+.conn-expand p { font-size: 13.5px; color: var(--text-2, #6e6e73); margin: 0 0 10px; }
+.conn-row { display: flex; gap: 8px; }
+.conn-row input {
+  flex: 1; min-width: 0; font-family: ui-monospace, monospace; font-size: 14px;
+  padding: 11px 14px; border: 1px solid rgba(128,128,128,0.30); border-radius: 10px;
+  background: var(--bg-2, #f5f5f7); color: var(--text, #1d1d1f); outline: none;
+}
+.conn-row input:focus { border-color: var(--accent, #75aae7); }
+.conn-foot { text-align: center; font-size: 13px; color: var(--text-3, #86868b); margin-top: 28px; line-height: 1.7; }
+.conn-ok-banner {
+  display: none; text-align: center; font-size: 14px; font-weight: 500;
+  background: #e8f6ef; color: #0a6b4d; border-radius: 12px; padding: 13px 16px; margin-bottom: 20px;
+}
+[data-theme="dark"] .conn-ok-banner { background: #0e2a1f; color: #62caa0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Listo">l<span class="i" onclick="event.preventDefault();event.stopPropagation();this.classList.remove('drop');void this.offsetWidth;this.classList.add('drop');">ı</span>sto</a>
+    <div class="nav-links">
+      <a href="index.html" data-i18n="nav.home">Startseite</a>
+      <div class="nav-controls">
+        <select class="lang-select" id="lang" onchange="setLang(this.value)" aria-label="Sprache wählen">
+          <option value="de">🇩🇪 DE</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="fr">🇫🇷 FR</option>
+        </select>
+        <button class="theme-switch" id="themeBtn" onclick="toggleTheme()" aria-label="Hell/Dunkel umschalten" role="switch"><span class="knob"></span></button>
+      </div>
+      <button class="btn small ghost" onclick="doLogout()" data-i18n="nav.logout">Abmelden</button>
+    </div>
+  </div>
+</nav>
+
+<div class="conn-wrap">
+
+  <div class="conn-head">
+    <h1 data-i18n="head.title">Deine Verbindungen</h1>
+    <p id="emailLine">…</p>
+  </div>
+
+  <div class="conn-ok-banner" id="allDone" data-i18n="head.alldone">✓ Alles verbunden — schick dem Bot einfach Fotos.</div>
+
+  <!-- eBay -->
+  <div class="conn-card">
+    <div class="conn-top">
+      <div class="conn-icon" style="background:#fdeeda;">🏪</div>
+      <span class="conn-title">eBay</span>
+      <span class="conn-status" id="stEbay">…</span>
+    </div>
+    <p class="conn-desc" data-i18n="ebay.desc">Verbinde dein eBay-Verkäuferkonto. Listo erstellt deine Listings darauf — und veröffentlicht nie ohne dein ✅.</p>
+    <button class="conn-btn" id="ebayBtn" onclick="connectEbay()">…</button>
+    <div class="conn-expand" id="paste-area" style="display:none;">
+      <p data-i18n="ebay.paste">Nach der Bestätigung bei eBay: Kopiere die komplette Adresse aus der Browser-Adresszeile und füge sie hier ein.</p>
+      <div class="conn-row">
+        <input type="text" id="redirectUrl" placeholder="https://auth.ebay.com/…?code=…">
+        <button class="conn-btn" style="width:auto;" onclick="submitEbayUrl()" data-i18n="ebay.submit">Verbinden</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telegram -->
+  <div class="conn-card">
+    <div class="conn-top">
+      <div class="conn-icon" style="background:#e3f0fc;">✈️</div>
+      <span class="conn-title">Telegram</span>
+      <span class="conn-status" id="stTg">…</span>
+    </div>
+    <p class="conn-desc" data-i18n="tg.desc">Verknüpfe dein Telegram — danach schickst du dem Bot einfach Fotos und er erledigt den Rest.</p>
+    <button class="conn-btn" id="tgBtn" onclick="connectTelegram()">…</button>
+    <div class="conn-expand" id="tg-area" style="display:none;">
+      <p data-i18n="tg.codehint">Schick diesen Code an den Bot — die Seite erkennt die Verknüpfung automatisch.</p>
+      <div class="conn-row" style="margin-bottom:10px;">
+        <input type="text" id="tgCode" value="…" readonly>
+        <button class="conn-btn secondary" style="width:auto;" onclick="copyCode(this)" data-i18n="tg.copy">Kopieren</button>
+      </div>
+      <a class="conn-btn secondary" id="tgLink" href="#" target="_blank" style="text-decoration:none;" data-i18n="tg.open">Bot in Telegram öffnen ↗</a>
+    </div>
+  </div>
+
+  <p class="conn-foot">
+    <span data-i18n="foot.hint">Beide verbunden? Der Bot fragt noch kurz nach deiner Versandadresse — danach einfach Fotos schicken.</span><br>
+    <a href="onboarding.html" data-i18n="foot.plan">Plan wählen oder ändern →</a>
+  </p>
+
+</div>
+
+<script>
+const T = {
+en: {
+"nav.home":"Home","nav.logout":"Sign out",
+"head.title":"Your connections","head.alldone":"✓ All connected — just send photos to the bot.",
+"ebay.desc":"Connect your eBay seller account. Listo creates your listings on it — and never publishes without your ✅.",
+"ebay.paste":"After confirming on eBay: copy the full address from the browser bar and paste it here.","ebay.submit":"Connect",
+"tg.desc":"Link your Telegram — then just send photos to the bot and it handles the rest.",
+"tg.codehint":"Send this code to the bot — the page detects the link automatically.","tg.copy":"Copy","tg.open":"Open bot in Telegram ↗",
+"foot.hint":"Both connected? The bot will briefly ask for your shipping address — then just send photos.","foot.plan":"Choose or change plan →",
+"st.on":"✓ connected","st.off":"not connected","signedin":"Signed in as","copied":"Copied ✓",
+"btn.ebay":"Connect with eBay →","btn.ebay.re":"Create new connection ↻","btn.tg":"Connect Telegram →","btn.tg.re":"Create new connection ↻",
+"err.connect":"Connection failed — please try again."
+},
+es: {
+"nav.home":"Inicio","nav.logout":"Cerrar sesión",
+"head.title":"Tus conexiones","head.alldone":"✓ Todo conectado — solo envía fotos al bot.",
+"ebay.desc":"Conecta tu cuenta de vendedor de eBay. Listo crea tus anuncios en ella — y nunca publica sin tu ✅.",
+"ebay.paste":"Tras confirmar en eBay: copia la dirección completa de la barra del navegador y pégala aquí.","ebay.submit":"Conectar",
+"tg.desc":"Vincula tu Telegram — luego solo envía fotos al bot y él hace el resto.",
+"tg.codehint":"Envía este código al bot — la página detecta la vinculación automáticamente.","tg.copy":"Copiar","tg.open":"Abrir bot en Telegram ↗",
+"foot.hint":"¿Ambos conectados? El bot te pedirá brevemente tu dirección de envío — luego solo envía fotos.","foot.plan":"Elegir o cambiar plan →",
+"st.on":"✓ conectado","st.off":"no conectado","signedin":"Sesión iniciada como","copied":"Copiado ✓",
+"btn.ebay":"Conectar con eBay →","btn.ebay.re":"Crear nueva conexión ↻","btn.tg":"Conectar Telegram →","btn.tg.re":"Crear nueva conexión ↻",
+"err.connect":"Conexión fallida — inténtalo de nuevo."
+},
+it: {
+"nav.home":"Home","nav.logout":"Esci",
+"head.title":"Le tue connessioni","head.alldone":"✓ Tutto collegato — manda semplicemente le foto al bot.",
+"ebay.desc":"Collega il tuo account venditore eBay. Listo crea lì i tuoi annunci — e non pubblica mai senza il tuo ✅.",
+"ebay.paste":"Dopo la conferma su eBay: copia l'indirizzo completo dalla barra del browser e incollalo qui.","ebay.submit":"Collega",
+"tg.desc":"Collega il tuo Telegram — poi manda le foto al bot e lui fa il resto.",
+"tg.codehint":"Invia questo codice al bot — la pagina rileva il collegamento automaticamente.","tg.copy":"Copia","tg.open":"Apri il bot su Telegram ↗",
+"foot.hint":"Entrambi collegati? Il bot chiederà brevemente il tuo indirizzo di spedizione — poi manda le foto.","foot.plan":"Scegli o cambia piano →",
+"st.on":"✓ collegato","st.off":"non collegato","signedin":"Accesso come","copied":"Copiato ✓",
+"btn.ebay":"Collega con eBay →","btn.ebay.re":"Crea nuova connessione ↻","btn.tg":"Collega Telegram →","btn.tg.re":"Crea nuova connessione ↻",
+"err.connect":"Connessione fallita — riprova."
+},
+fr: {
+"nav.home":"Accueil","nav.logout":"Se déconnecter",
+"head.title":"Vos connexions","head.alldone":"✓ Tout est connecté — envoyez simplement des photos au bot.",
+"ebay.desc":"Connectez votre compte vendeur eBay. Listo y crée vos annonces — et ne publie jamais sans votre ✅.",
+"ebay.paste":"Après confirmation sur eBay : copiez l'adresse complète de la barre du navigateur et collez-la ici.","ebay.submit":"Connecter",
+"tg.desc":"Liez votre Telegram — ensuite envoyez simplement des photos au bot, il s'occupe du reste.",
+"tg.codehint":"Envoyez ce code au bot — la page détecte la liaison automatiquement.","tg.copy":"Copier","tg.open":"Ouvrir le bot dans Telegram ↗",
+"foot.hint":"Les deux connectés ? Le bot demandera brièvement votre adresse d'expédition — ensuite envoyez vos photos.","foot.plan":"Choisir ou changer de forfait →",
+"st.on":"✓ connecté","st.off":"non connecté","signedin":"Connecté en tant que","copied":"Copié ✓",
+"btn.ebay":"Connecter avec eBay →","btn.ebay.re":"Créer une nouvelle connexion ↻","btn.tg":"Connecter Telegram →","btn.tg.re":"Créer une nouvelle connexion ↻",
+"err.connect":"Échec de la connexion — réessayez."
+}
+};
+const de = {
+"st.on":"✓ verbunden","st.off":"nicht verbunden","signedin":"Angemeldet als","copied":"Kopiert ✓",
+"btn.ebay":"Mit eBay verbinden →","btn.ebay.re":"Neue Verbindung herstellen ↻",
+"btn.tg":"Telegram verbinden →","btn.tg.re":"Neue Verbindung herstellen ↻",
+"err.connect":"Verbindung fehlgeschlagen — bitte erneut versuchen."
+};
+document.querySelectorAll("[data-i18n]").forEach(el => { de[el.dataset.i18n] = el.innerHTML; });
+T.de = de;
+let L = de;
+
+function setLang(lang) {
+  L = T[lang] || T.de;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (L[el.dataset.i18n] !== undefined) el.innerHTML = L[el.dataset.i18n];
+  });
+  document.documentElement.lang = lang;
+  localStorage.setItem("listo-lang", lang);
+  document.getElementById("lang").value = lang;
+  if (me) render();
+}
+
+let me = null;
+let pollTimer = null;
+
+async function api(path, options) {
+  const resp = await fetch(path, Object.assign({
+    headers: { "Content-Type": "application/json" }, credentials: "same-origin",
+  }, options));
+  return { status: resp.status, data: await resp.json().catch(() => ({})) };
+}
+
+function render() {
+  document.getElementById("emailLine").textContent = L["signedin"] + " " + me.email;
+  setPill("stEbay", me.ebay_connected);
+  setPill("stTg", me.telegram_linked);
+  const ebayBtn = document.getElementById("ebayBtn");
+  ebayBtn.textContent = me.ebay_connected ? L["btn.ebay.re"] : L["btn.ebay"];
+  ebayBtn.classList.toggle("secondary", !!me.ebay_connected);
+  const tgBtn = document.getElementById("tgBtn");
+  tgBtn.textContent = me.telegram_linked ? L["btn.tg.re"] : L["btn.tg"];
+  tgBtn.classList.toggle("secondary", !!me.telegram_linked);
+  document.getElementById("allDone").style.display =
+    (me.ebay_connected && me.telegram_linked) ? "block" : "none";
+}
+
+function setPill(id, on) {
+  const el = document.getElementById(id);
+  el.textContent = on ? L["st.on"] : L["st.off"];
+  el.classList.toggle("on", !!on);
+}
+
+async function init() {
+  const { status, data } = await api("/api/me");
+  if (status !== 200) { window.location = "login.html"; return; }
+  me = data;
+  render();
+}
+
+function connectEbay() {
+  document.getElementById("paste-area").style.display = "block";
+  window.open("/connect/ebay", "_blank");
+}
+
+async function submitEbayUrl() {
+  const url = document.getElementById("redirectUrl").value.trim();
+  const { status, data } = await api("/api/ebay-redirect", { method: "POST", body: JSON.stringify({ url }) });
+  if (status !== 200) { alert(data.error || L["err.connect"]); return; }
+  document.getElementById("paste-area").style.display = "none";
+  document.getElementById("redirectUrl").value = "";
+  await init();
+}
+
+async function connectTelegram() {
+  const { status, data } = await api("/api/telegram-code", { method: "POST" });
+  if (status !== 200) return;
+  document.getElementById("tg-area").style.display = "block";
+  document.getElementById("tgCode").value = data.code;
+  document.getElementById("tgLink").href = data.url;
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    await init();
+    if (me && me.telegram_linked) {
+      document.getElementById("tg-area").style.display = "none";
+      clearInterval(pollTimer);
+    }
+  }, 3000);
+}
+
+function copyCode(btn) {
+  navigator.clipboard.writeText(document.getElementById("tgCode").value);
+  btn.textContent = L["copied"];
+}
+
+async function doLogout() {
+  await api("/api/logout", { method: "POST" });
+  window.location = "index.html";
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("listo-theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+applyTheme(localStorage.getItem("listo-theme")
+  || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+setLang(localStorage.getItem("listo-lang") || "en");
+init();
+</script>
+
+<script>
+fetch("/api/event", {
+  method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+  body: JSON.stringify({ path: location.pathname, ref: document.referrer, lang: navigator.language }),
+}).catch(() => {});
+</script>
+<script src="i18n-admin.js?v=1"></script>
+<script src="listo-fx.js?v=2"></script>
+</body>
+</html>

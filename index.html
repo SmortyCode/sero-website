@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listo — Photograph anything. Sell it on eBay.</title>
+<meta name="description" content="Send photos of any product to your Telegram bot — Listo writes the eBay listing, checks market prices and publishes after your ✅. From trading card to couch.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<!-- Social-Link-Vorschau: og:image/og:url nach Domain-Kauf auf absolute https://DOMAIN/… umstellen -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Listo">
+<meta property="og:title" content="Listo — Photograph anything. Sell it on eBay.">
+<meta property="og:description" content="Photo → live eBay listing in 30 seconds. Reads PSA slabs, checks market prices, publishes after your ✅. 0× typing.">
+<meta property="og:image" content="assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Listo — Photograph anything. Sell it on eBay.">
+<meta name="twitter:description" content="Photo → live eBay listing in 30 seconds. Reads PSA slabs, checks market prices, publishes after your ✅. 0× typing.">
+<meta name="twitter:image" content="assets/og-image.png">
+<link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
+
+<div id="introSplash" style="display:none;" onclick="endIntro()">
+  <video id="introVideo" muted playsinline preload="auto" src="assets/intro.mp4"></video>
+  <span class="skip" data-i18n="intro.skip">Überspringen</span>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Listo">l<span class="i" onclick="event.preventDefault();event.stopPropagation();this.classList.remove('drop');void this.offsetWidth;this.classList.add('drop');">ı</span>sto</a>
+    <div class="nav-links">
+      <a href="#how" data-i18n="nav.how">So funktioniert's</a>
+      <a href="#pricing" data-i18n="nav.pricing">Preise</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="guide.html" data-i18n="nav.guide">Anleitung</a>
+      <a href="login.html" class="btn small ghost" id="navLogin" data-i18n="nav.login">Anmelden</a>
+      <a class="btn small" href="onboarding.html" id="navCta" data-i18n="nav.cta">Kostenlos starten</a>
+      <a href="app.html" class="btn small" id="navProfile" style="display:none;">Mein Konto</a>
+      <div class="nav-controls">
+        <select class="lang-select" id="lang" onchange="setLang(this.value)" aria-label="Sprache wählen">
+          <option value="de">🇩🇪 DE</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="fr">🇫🇷 FR</option>
+        </select>
+        <button class="theme-switch" id="themeBtn" onclick="toggleTheme()" aria-label="Hell/Dunkel umschalten" role="switch"><span class="knob"></span></button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="bg-dot" style="width:440px;height:440px;top:-100px;left:-160px;" data-speed="0.12"></div>
+  <div class="bg-dot" style="width:340px;height:340px;top:300px;right:-140px;" data-speed="-0.08"></div>
+  <div class="eyebrow-pill" data-i18n="hero.pill">Dein KI-Verkäufer für eBay</div>
+  <h1 data-i18n="hero.h1">Fotografier irgendwas.<br>Verkauf es auf eBay.</h1>
+  <p class="sub" data-i18n="hero.sub">Sammelkarte, Konsole, Kinderwagen — schick deinem Telegram-Bot einfach Fotos. Listo erkennt das Produkt, schreibt Titel, Beschreibung und Preis und stellt nach deinem ✅ direkt auf eBay ein. Ohne ein Wort zu tippen.</p>
+  <a class="btn" href="onboarding.html" data-i18n="hero.cta1">Kostenlos starten</a>
+  <a class="btn ghost" href="#how" style="margin-left: 10px;" data-i18n="hero.cta2">So funktioniert's</a>
+  <p class="note" data-i18n="hero.note">14 Tage kostenlos testen · Du zahlst erst, wenn alles eingerichtet ist und funktioniert</p>
+
+  <div class="stats">
+    <div class="stat"><div class="v" data-i18n="stats.v1">~30 Sek</div><div class="l" data-i18n="stats.l1">pro Listing</div></div>
+    <div class="stat"><div class="v">0×</div><div class="l" data-i18n="stats.l2">Tipparbeit</div></div>
+    <div class="stat"><div class="v" data-i18n="stats.v3">Jedes Produkt</div><div class="l" data-i18n="stats.l3">von der Karte bis zur Couch</div></div>
+  </div>
+
+  <div class="demo-tabs" role="tablist" aria-label="Demo-Produkt wählen">
+    <button class="demo-tab active" onclick="showDemo('card', this)">🎴 <span data-i18n="dt.card">Karte</span></button>
+    <button class="demo-tab" onclick="showDemo('snk', this)">👟 <span data-i18n="dt.snk">Sneaker</span></button>
+    <button class="demo-tab" onclick="showDemo('ctrl', this)">🎮 <span data-i18n="dt.ctrl">Game Boy</span></button>
+    <button class="demo-tab" onclick="showDemo('lego', this)">🧱 <span data-i18n="dt.lego">LEGO</span></button>
+  </div>
+
+  <div class="chat demo-chat active" data-demo="card" aria-label="Beispiel-Chat mit dem Listo-Bot">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="chat.status">online</div></div>
+    </div>
+    <div class="bubble me">
+      <div class="photo-pair" style="margin-bottom:0;">
+        <figure><span class="holo-wrap" style="border-radius:6px;"><img data-pop="card" src="assets/card-front-white.jpg?v=7" alt="PSA-10-Slab Vorderseite — Monkey D. Luffy Dodgers Night" style="height:156px;width:auto;border-radius:6px;display:block;"></span><figcaption data-i18n="chat.front">Vorderseite</figcaption></figure>
+        <figure><span class="holo-wrap" style="border-radius:6px;"><img data-pop="card" src="assets/card-back-white.jpg?v=7" alt="PSA-10-Slab Rückseite" style="height:156px;width:auto;border-radius:6px;display:block;"></span><figcaption data-i18n="chat.back">Rückseite</figcaption></figure>
+      </div>
+    </div>
+    <div class="bubble bot">
+      <strong data-i18n="chat.title">One Piece Luffy EB02-010 Dodgers Night PSA 10</strong>
+      <div class="meta" data-i18n="chat.meta">📁 TCG Einzelkarten &nbsp;·&nbsp; 🏷 Graded — PSA 10, Zert. erkannt ✓<br>📊 Markt recherchiert: 3.400–4.900 €, Median 3.800 €<br>💶 Preis automatisch gesetzt: 3.609,90 € &nbsp;·&nbsp; 🖼 freigestellt ✓</div>
+      <div class="chip-row"><span class="chip" data-i18n="chat.chip1">✅ Hochladen</span><span class="chip" data-i18n="chat.chip2">✏️ Preis</span><span class="chip" data-i18n="chat.chip3">🔁 Neu</span></div>
+    </div>
+    <div class="bubble bot"><span class="live" data-i18n="chat.live">✅ Listing ist live!</span><div class="meta">ebay.de/itm/2273838…</div></div>
+  </div>
+
+  <div class="chat demo-chat" data-demo="snk" aria-label="Beispiel-Chat: Sneaker">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="chat.status">online</div></div>
+    </div>
+    <div class="bubble me">
+      <div class="photo-pair" style="margin-bottom:0;">
+        <figure style="margin:0;"><span class="holo-wrap" style="border-radius:8px;display:block;"><img data-pop="snk" src="assets/demo-sneaker.jpg?v=2" alt="Sneaker-Foto" style="width:248px;max-width:100%;border-radius:8px;display:block;"></span></figure>
+      </div>
+    </div>
+    <div class="bubble bot">
+      <strong data-i18n="d2.title">Nike SB Dunk Low Travis Scott · EU 42</strong>
+      <div class="meta" data-i18n="d2.meta">📁 Sneaker &nbsp;·&nbsp; 👟 Zustand: Gebraucht — sehr gut, mit Original-Karton<br>📊 Markt recherchiert: 1.150–1.900 €, Median 1.450 €<br>💶 Preis automatisch gesetzt: 1.377,90 € &nbsp;·&nbsp; 🖼 freigestellt ✓</div>
+      <div class="chip-row"><span class="chip" data-i18n="chat.chip1">✅ Hochladen</span><span class="chip" data-i18n="chat.chip2">✏️ Preis</span><span class="chip" data-i18n="chat.chip3">🔁 Neu</span></div>
+    </div>
+    <div class="bubble bot"><span class="live" data-i18n="chat.live">✅ Listing ist live!</span><div class="meta">ebay.de/itm/2273901…</div></div>
+  </div>
+
+  <div class="chat demo-chat" data-demo="ctrl" aria-label="Beispiel-Chat: Controller">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="chat.status">online</div></div>
+    </div>
+    <div class="bubble me">
+      <div class="photo-pair" style="margin-bottom:0;">
+        <figure style="margin:0;"><span class="holo-wrap" style="border-radius:8px;display:block;"><img data-pop="ctrl" src="assets/demo-gameboy.jpg?v=2" alt="Game-Boy-Foto" style="width:248px;max-width:100%;border-radius:8px;display:block;"></span></figure>
+      </div>
+    </div>
+    <div class="bubble bot">
+      <strong data-i18n="d3.title">Nintendo Game Boy Advance · Silber (2001)</strong>
+      <div class="meta" data-i18n="d3.meta">📁 Retro-Gaming &nbsp;·&nbsp; 🎮 Zustand: Gebraucht — getestet, voll funktionsfähig<br>📊 Markt recherchiert: 70–140 €, Median 100 €<br>💶 Preis automatisch gesetzt: 94,90 € &nbsp;·&nbsp; 🖼 freigestellt ✓</div>
+      <div class="chip-row"><span class="chip" data-i18n="chat.chip1">✅ Hochladen</span><span class="chip" data-i18n="chat.chip2">✏️ Preis</span><span class="chip" data-i18n="chat.chip3">🔁 Neu</span></div>
+    </div>
+    <div class="bubble bot"><span class="live" data-i18n="chat.live">✅ Listing ist live!</span><div class="meta">ebay.de/itm/2273914…</div></div>
+  </div>
+
+  <div class="chat demo-chat" data-demo="lego" aria-label="Beispiel-Chat: LEGO">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="chat.status">online</div></div>
+    </div>
+    <div class="bubble me">
+      <div class="photo-pair" style="margin-bottom:0;">
+        <figure style="margin:0;"><span class="holo-wrap" style="border-radius:8px;display:block;"><img data-pop="lego" src="assets/demo-lego.jpg?v=2" alt="LEGO-Set-Foto" style="width:196px;max-width:100%;border-radius:8px;display:block;"></span></figure>
+      </div>
+    </div>
+    <div class="bubble bot">
+      <strong data-i18n="d4.title">LEGO Pokémon 72153 Bisaflor, Glurak &amp; Turtok</strong>
+      <div class="meta" data-i18n="d4.meta">📁 LEGO Sets &nbsp;·&nbsp; 🧱 Zustand: Neu &amp; OVP — 6.838 Teile, versiegelt<br>📊 Markt recherchiert: 480–640 €, Median 550 €<br>💶 Preis automatisch gesetzt: 522,90 € &nbsp;·&nbsp; 🖼 freigestellt ✓</div>
+      <div class="chip-row"><span class="chip" data-i18n="chat.chip1">✅ Hochladen</span><span class="chip" data-i18n="chat.chip2">✏️ Preis</span><span class="chip" data-i18n="chat.chip3">🔁 Neu</span></div>
+    </div>
+    <div class="bubble bot"><span class="live" data-i18n="chat.live">✅ Listing ist live!</span><div class="meta">ebay.de/itm/2273926…</div></div>
+  </div>
+</header>
+
+<div class="card-pop" id="cardPop" data-pop-id="card" role="tooltip" aria-hidden="true">
+  <span class="holo-wrap" id="cardPopWrap"><img id="cardPopImg" src="assets/card-front-white.jpg?v=7" alt="Karte in Großansicht"></span>
+  <strong data-i18n="cp.title">Monkey D. Luffy „Dodgers Night" · EB02-010 · PSA 10</strong>
+  <p data-i18n="cp.what">Offizieller Promo-Reprint aus der Anime 25th Collection [EB-02]: Luffy im Dodgers-Trikot, englische Ausgabe.</p>
+  <div class="cp-tl">
+    <div class="tli" data-i18n="cp.t1"><strong>3. Juli 2025 · Dodger Stadium, Los Angeles</strong><br>Bei der „ONE PIECE Night" an Ticket-Besucher verteilt — die ersten 40.000 Fans bekamen dazu Luffys Strohhut.</div>
+    <div class="tli" data-i18n="cp.t2"><strong>PSA-Grading</strong><br>Gem Mint 10 — Grade und Zertifikat liest Listo direkt vom Slab-Label.</div>
+    <div class="tli" data-i18n="cp.t3"><strong>Mit Listo gelistet</strong><br>Fotos an den Bot — fertiges eBay-Listing in ~30 Sekunden, Preis automatisch recherchiert.</div>
+    <div class="tli" data-i18n="cp.t4"><strong>✅ Live auf eBay</strong><br>3.609,90 € Sofortkauf — Markt-Median 3.800 €.</div>
+  </div>
+</div>
+
+<div class="card-pop" id="pop-snk" data-pop-id="snk" role="tooltip" aria-hidden="true">
+  <span class="holo-wrap"><img src="assets/demo-sneaker.jpg?v=2" alt="Sneaker in Großansicht"></span>
+  <strong data-i18n="d2.title">Nike SB Dunk Low Travis Scott · EU 42</strong>
+  <p data-i18n="sp.what">„Cactus Jack"-Kollaboration von Travis Scott &amp; Nike SB — Bandana-Muster, gedrehter brauner Swoosh und versteckte Extra-Schnürsenkel.</p>
+  <div class="cp-tl">
+    <div class="tli" data-i18n="sp.t1"><strong>28. Februar 2020 · Release</strong><br>Sofort ausverkauft — einer der gehyptesten SB Dunks aller Zeiten.</div>
+    <div class="tli" data-i18n="sp.t2"><strong>Zustand erkannt</strong><br>Gebraucht — sehr gut, mit Original-Karton (US 8.5 = EU 42).</div>
+    <div class="tli" data-i18n="sp.t3"><strong>✅ Live auf eBay</strong><br>1.377,90 € — Markt-Median 1.450 €.</div>
+  </div>
+</div>
+
+<div class="card-pop" id="pop-ctrl" data-pop-id="ctrl" role="tooltip" aria-hidden="true">
+  <span class="holo-wrap"><img src="assets/demo-gameboy.jpg?v=2" alt="Game Boy in Großansicht"></span>
+  <strong data-i18n="d3.title">Nintendo Game Boy Advance · Silber (2001)</strong>
+  <p data-i18n="gp.what">Nintendos 32-Bit-Handheld der 6. Generation im Querformat — Heimat von Klassikern wie Mario, Zelda und Pokémon.</p>
+  <div class="cp-tl">
+    <div class="tli" data-i18n="gp.t1"><strong>2001 · Marktstart</strong><br>Über 80 Mio. verkaufte Einheiten der GBA-Familie weltweit.</div>
+    <div class="tli" data-i18n="gp.t2"><strong>Zustand erkannt</strong><br>Gebraucht — getestet, voll funktionsfähig.</div>
+    <div class="tli" data-i18n="gp.t3"><strong>✅ Live auf eBay</strong><br>94,90 € — Markt-Median 100 €.</div>
+  </div>
+</div>
+
+<div class="card-pop" id="pop-lego" data-pop-id="lego" role="tooltip" aria-hidden="true">
+  <span class="holo-wrap"><img src="assets/demo-lego.jpg?v=2" alt="LEGO-Set in Großansicht"></span>
+  <strong data-i18n="d4.title">LEGO Pokémon 72153 Bisaflor, Glurak &amp; Turtok</strong>
+  <p data-i18n="lp.what">Sammler-Set für Erwachsene (18+): die drei Kanto-Starter-Finalformen Bisaflor, Glurak &amp; Turtok auf einem Display-Sockel.</p>
+  <div class="cp-tl">
+    <div class="tli" data-i18n="lp.t1"><strong>6.838 Teile · 18+</strong><br>Eines der größten Pokémon-LEGO-Sets überhaupt.</div>
+    <div class="tli" data-i18n="lp.t2"><strong>Zustand erkannt</strong><br>Neu &amp; versiegelt (Original-OVP).</div>
+    <div class="tli" data-i18n="lp.t3"><strong>✅ Live auf eBay</strong><br>522,90 € — Markt-Median 550 €.</div>
+  </div>
+</div>
+
+<section id="how" class="alt">
+  <div class="inner">
+    <h2 class="section-title" data-i18n="how.title">Knipsen. Bestätigen. Sold.</h2>
+    <p class="section-sub" data-i18n="how.sub">Vom Stapel zum Listing — du behältst bei jedem Schritt die Kontrolle.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="step-num" data-i18n="how.n1">SCHRITT 1</div>
+        <h3 data-i18n="how.h1">Fotografieren</h3>
+        <p data-i18n="how.p1">Egal was: Fotos als Album an deinen Listo-Bot in Telegram. Kurze Notiz dazu — „Sofortkauf 70€ mit VB ab 50", „Auktion ab 1€", Stückzahl — versteht er von selbst.</p>
+      </div>
+      <div class="card">
+        <div class="step-num" data-i18n="how.n2">SCHRITT 2</div>
+        <h3 data-i18n="how.h2">Listo macht den Papierkram</h3>
+        <p data-i18n="how.p2">Produkt erkannt, Titel und Beschreibung geschrieben, Kategorie samt aller eBay-Pflichtfelder gesetzt, Marktpreise gecheckt, Foto freigestellt — bei Sammlerware liest er sogar PSA-Labels vom Slab. Alles, was dich sonst 10 Minuten kostet.</p>
+      </div>
+      <div class="card">
+        <div class="step-num" data-i18n="how.n3">SCHRITT 3</div>
+        <h3 data-i18n="how.h3">✅ und nächste Karte</h3>
+        <p data-i18n="how.p3">Vorschau checken, ggf. Preis antippen — dann ✅. Nichts geht jemals ohne dein Okay live. Und während das Listing published, fotografierst du schon den nächsten Artikel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="inner" style="text-align:center;">
+    <h2 class="section-title" data-i18n="all.title">Was kann ich verkaufen? Alles.</h2>
+    <p class="section-sub" data-i18n="all.sub">Listo ist bei Sammlerware unschlagbar — erkennt aber jedes Produkt, das du vor die Linse hältst.</p>
+    <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:740px; margin:0 auto;">
+      <span class="cat-chip" data-i18n="all.c1">🎴 Trading Cards</span>
+      <span class="cat-chip" data-i18n="all.c2">👟 Sneaker</span>
+      <span class="cat-chip" data-i18n="all.c3">📱 Technik</span>
+      <span class="cat-chip" data-i18n="all.c4">🧸 Plüsch &amp; Figuren</span>
+      <span class="cat-chip" data-i18n="all.c5">🎮 Videospiele</span>
+      <span class="cat-chip" data-i18n="all.c6">🕰 Vintage &amp; Retro</span>
+      <span class="cat-chip" data-i18n="all.c7">🧱 LEGO</span>
+      <span class="cat-chip" data-i18n="all.c8">⌚ Uhren &amp; Schmuck</span>
+      <span class="cat-chip" data-i18n="all.c9">👕 Fashion</span>
+      <span class="cat-chip hl" data-i18n="all.c10">📦 … einfach alles</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="inner">
+    <h2 class="section-title" data-i18n="feat.title">Gebaut von einem Seller, der das Tippen satt hatte.</h2>
+    <p class="section-sub" data-i18n="feat.sub">Listo kennt die eBay-Fallen, an denen andere Tools scheitern — weil wir selbst hineingetreten sind.</p>
+    <div class="grid-3">
+      <div class="card"><h3 data-i18n="feat.h1">Slab-Reader</h3><p data-i18n="feat.p1">PSA, CGC, BGS — Listo liest Bewerter, Note und Zertifikatsnummer direkt vom Label. eBays Graded-Pflichtfelder füllen sich von selbst, statt dass du Zert-Nummern abtippst.</p></div>
+      <div class="card"><h3 data-i18n="feat.h2">Live-Comps</h3><p data-i18n="feat.p2">Vor jedem Listing checkt Listo aktive Vergleichsangebote: Spanne, Median, Vorschlag. Du siehst sofort, wo der Markt steht — dein Wunschpreis hat trotzdem immer das letzte Wort.</p></div>
+      <div class="card"><h3 data-i18n="feat.h3">Raw Cards? Auch easy.</h3><p data-i18n="feat.p3">eBays Zustandspflicht für lose Karten (Near Mint, bespielt, …) — der Grund, warum Bulk-Seller verzweifeln — wird automatisch gesetzt. Tausendmal Anklicken entfällt.</p></div>
+      <div class="card"><h3 data-i18n="feat.h4">Bulk ohne Burnout</h3><p data-i18n="feat.p4">Karte für Karte, so schnell wie du fotografierst. Sammlungsauflösung, Vault-Räumung, Display-Pull-Verkauf: Der Stapel schrumpft, nicht dein Wochenende.</p></div>
+      <div class="card"><h3 data-i18n="feat.h5">Dein Shop-Look</h3><p data-i18n="feat.p5">Jedes Foto wird freigestellt und einheitlich auf deinen Hintergrund gesetzt — Farbe frei wählbar. Dein Profil sieht aus wie ein Store, nicht wie ein Flohmarkt.</p></div>
+      <div class="card"><h3 data-i18n="feat.h6">Auktion, BIN, Best Offer</h3><p data-i18n="feat.p6">„Auktion ab 1€", „Sofortkauf 70€ mit Preisvorschlag ab 50€", „10 Stück je 2,50€" — schreib es in die Caption, Listo setzt es exakt so um.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="inner">
+    <h2 class="section-title" data-i18n="math.title">Die ehrliche Rechnung.</h2>
+    <p class="section-sub" data-i18n="math.sub">100 Artikel listen — einmal von Hand, einmal mit Listo.</p>
+    <div class="grid-3" style="max-width: 760px; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="card">
+        <h3 data-i18n="math.m1t">Von Hand</h3>
+        <div class="price" style="font-size: 32px;" data-i18n="math.m1v">~16 Stunden</div>
+        <p data-i18n="math.m1d">Titel formulieren, 12 Pflichtfelder klicken, Beschreibung tippen, Preise vergleichen, Fotos zuschneiden — ≈ 10 Minuten pro Artikel. Zwei volle Arbeitstage.</p>
+      </div>
+      <div class="card" style="outline: 2px solid var(--accent);">
+        <h3 data-i18n="math.m2t">Mit Listo</h3>
+        <div class="price" style="font-size: 32px;" data-i18n="math.m2v">~50 Minuten</div>
+        <p data-i18n="math.m2d">Knipsen, Caption, ✅ — fertig ist das Listing, während du den nächsten Artikel holst. Der Rest deines Wochenendes gehört wieder dir.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="inner">
+    <h2 class="section-title" data-i18n="pr.title">Erst einrichten. Dann testen.<br>Dann erst zahlen.</h2>
+    <p class="section-sub" data-i18n="pr.sub">Du verbindest eBay und Telegram, machst einen Probelauf mit einer echten Karte — und entscheidest dich erst danach. 14 Tage kostenlos, jederzeit kündbar.</p>
+    <div class="grid-3">
+      <div class="card price-card" style="background: var(--bg-2);">
+        <h3>Starter</h3>
+        <div class="price">9,90 €<small data-i18n="pr.unit">/Monat</small></div>
+        <ul>
+          <li data-i18n="pr.s1">30 Listings pro Monat</li>
+          <li data-i18n="pr.s2">Slab-Reader &amp; Live-Comps</li>
+          <li data-i18n="pr.s3">Auktion, Sofortkauf &amp; Best Offer</li>
+          <li data-i18n="pr.s4">1 eBay-Konto</li>
+        </ul>
+        <a class="btn ghost" href="onboarding.html" data-i18n="pr.cta">Kostenlos testen</a>
+      </div>
+      <div class="card price-card featured" style="background: var(--bg-2);">
+        <span class="badge" data-i18n="pr.badge">Beliebt</span>
+        <h3>Reseller</h3>
+        <div class="price">24,90 €<small data-i18n="pr.unit2">/Monat</small></div>
+        <ul>
+          <li data-i18n="pr.r1">200 Listings pro Monat</li>
+          <li data-i18n="pr.r2">Alles aus Starter</li>
+          <li data-i18n="pr.r3">Auto-Freisteller mit Shop-Look</li>
+          <li data-i18n="pr.r4">Sets, Stückzahlen &amp; Bulk-Workflow</li>
+          <li data-i18n="pr.r5">Prio-Support</li>
+        </ul>
+        <a class="btn" href="onboarding.html" data-i18n="pr.cta2">Kostenlos testen</a>
+      </div>
+      <div class="card price-card" style="background: var(--bg-2);">
+        <h3>Shop</h3>
+        <div class="price">59,90 €<small data-i18n="pr.unit3">/Monat</small></div>
+        <ul>
+          <li data-i18n="pr.b1">Unbegrenzte Listings</li>
+          <li data-i18n="pr.b2">Alles aus Reseller</li>
+        </ul>
+        <a class="btn ghost" href="onboarding.html" data-i18n="pr.cta3">Kostenlos testen</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="alt">
+  <div class="inner">
+    <h2 class="section-title" data-i18n="faq.title">Häufige Fragen</h2>
+    <p class="section-sub" data-i18n="faq.sub">Ehrliche Antworten — kein Kleingedrucktes.</p>
+    <div class="faq">
+      <details open>
+        <summary data-i18n="faq.q1">Brauche ich einen eBay-Developer-Account?</summary>
+        <p data-i18n="faq.a1">Nein. Du verbindest einfach dein ganz normales eBay-Verkäuferkonto — ein Klick auf „Mit eBay verbinden", einloggen, bestätigen, fertig. Dauert 30 Sekunden. Listo nutzt die offizielle eBay-Schnittstelle und sieht dabei nie dein Passwort.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq.q2">Kann Listo etwas ohne mein Okay veröffentlichen?</summary>
+        <p data-i18n="faq.a2">Nein, niemals. Jedes Listing wird dir als Vorschau in Telegram gezeigt und geht erst live, wenn du auf ✅ tippst. Die Verbindung zu eBay kannst du jederzeit in deinem eBay-Konto widerrufen.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq.q3">Liest Listo wirklich PSA-Labels vom Foto?</summary>
+        <p data-i18n="faq.a3">Ja. Bewerter (PSA, CGC, BGS, …), Note und Zertifikatsnummer werden direkt vom Slab-Label erkannt und in eBays Graded-Pflichtfelder eingetragen. Ist das Label mal nicht lesbar, fragt der Bot kurz nach — geraten wird nie.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq.q4">Was passiert mit meinen Daten und Fotos?</summary>
+        <p data-i18n="faq.a4">Deine Fotos werden nur zur Erstellung deines Listings verarbeitet und nach der Veröffentlichung gelöscht. Deine eBay-Zugriffsberechtigung liegt verschlüsselt auf Servern in der EU. Wir verkaufen keine Daten — unser Geschäftsmodell ist dein Abo, nicht deine Daten.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq.q5">Welche Artikel funktionieren am besten?</summary>
+        <p data-i18n="faq.a5">Listo ist auf Sammlerware spezialisiert: Trading Cards (Pokémon, One Piece, Yu-Gi-Oh — raw und graded), Plüschfiguren, Videospiele und Merchandise. Aber auch Sneaker, Technik und Vintage funktionieren hervorragend.</p>
+      </details>
+      <details>
+        <summary data-i18n="faq.q6">Kann ich jederzeit kündigen?</summary>
+        <p data-i18n="faq.a6">Ja, monatlich kündbar mit einem Klick im Konto — keine Mindestlaufzeit, keine Kündigungsfrist, kein Anruf nötig.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section style="text-align: center;">
+  <div class="inner">
+    <h2 class="section-title" data-i18n="cta.title">Bei dir liegt Geld rum.<br>Fotografier es.</h2>
+    <p class="section-sub" data-i18n="cta.sub">Einrichtung in 3 Minuten. Zahlen musst du erst, wenn alles läuft.</p>
+    <a class="btn" href="onboarding.html" data-i18n="cta.btn">Kostenlos starten</a>
+  </div>
+</section>
+
+<section class="alt" style="text-align: center; position: relative; overflow: clip;">
+  <div class="bg-dot" style="width:380px;height:380px;bottom:-160px;left:50%;margin-left:-190px;" data-speed="-0.05"></div>
+  <div class="inner" style="max-width: 520px;">
+    <p style="font-size: 30px; margin-bottom: 4px;">🚀</p>
+    <h3 style="font-size: 22px; margin-bottom: 6px;" data-i18n="ph.h">Wir launchen bald auf Product Hunt.</h3>
+    <p style="color: var(--text-2); font-size: 15px; margin-bottom: 18px;" data-i18n="ph.p">Trag dich ein und erfahre es als Erster — Early Birds bekommen eine Überraschung.</p>
+    <form id="phForm" onsubmit="phNotify(event)" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <input class="input" type="email" required id="phEmail" placeholder="deine@email.de" data-i18n-ph="ph.ph" style="max-width: 260px; margin: 0;">
+      <button class="btn" type="submit" data-i18n="ph.btn">Benachrichtige mich</button>
+    </form>
+    <p id="phOk" style="display:none; color: var(--accent); font-weight: 600; margin-top: 14px;" data-i18n="ph.ok">✓ Du stehst auf der Liste!</p>
+  </div>
+</section>
+
+<footer>
+  <div class="inner">
+    <div data-i18n="foot.copy">© 2026 Listo · Made in Munich</div>
+    <div>
+      <a href="legal.html#impressum" data-i18n="foot.imprint">Impressum</a>
+      <a href="legal.html#datenschutz" data-i18n="foot.privacy">Datenschutz</a>
+      <a href="legal.html#agb" data-i18n="foot.terms">AGB</a>
+      <a href="mailto:sven.manuel@aol.com" data-i18n="foot.contact">Kontakt</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const T = {
+en: {
+"nav.how":"How it works","nav.pricing":"Pricing","nav.faq":"FAQ","nav.guide":"Guide","nav.login":"Sign in","nav.cta":"Start for free",
+"hero.pill":"Your AI seller for eBay","hero.h1":"Photograph anything.<br>Sell it on eBay.","hero.sub":"Trading card, console, stroller — just send photos to your Telegram bot. Listo identifies the product, writes title, description and price, and publishes straight to eBay after your ✅. Without typing a word.","hero.cta1":"Start for free","hero.cta2":"How it works","hero.note":"14-day free trial · You only pay once everything is set up and working",
+"stats.v1":"~30 sec","stats.l1":"per listing","stats.l2":"typing","stats.v3":"Any product","stats.l3":"from a card to a couch",
+"chat.status":"online","chat.front":"Front","chat.back":"Back","chat.title":"One Piece Luffy EB02-010 Dodgers Night PSA 10","chat.meta":"📁 TCG single cards &nbsp;·&nbsp; 🏷 Graded — PSA 10, cert detected ✓<br>📊 Market researched: €3,400–4,900, median €3,800<br>💶 Price set automatically: €3,609.90 &nbsp;·&nbsp; 🖼 background removed ✓",
+"cp.title":"Monkey D. Luffy \"Dodgers Night\" · EB02-010 · PSA 10",
+"cp.what":"Official promo reprint from the Anime 25th Collection [EB-02]: Luffy in a Dodgers jersey, English print.",
+"cp.t1":"<strong>July 3, 2025 · Dodger Stadium, Los Angeles</strong><br>Handed to ticketed fans at \"ONE PIECE Night\" — the first 40,000 fans also received Luffy's straw hat.",
+"cp.t2":"<strong>PSA grading</strong><br>Gem Mint 10 — Listo reads grade and cert straight off the slab label.",
+"cp.t3":"<strong>Listed with Listo</strong><br>Photos to the bot — finished eBay listing in ~30 seconds, price researched automatically.",
+"cp.t4":"<strong>✅ Live on eBay</strong><br>€3,609.90 Buy It Now — market median €3,800.",
+"dt.card":"Card","dt.snk":"Sneaker","dt.ctrl":"Game Boy","dt.lego":"LEGO",
+"d2.title":"Nike SB Dunk Low Travis Scott · EU 42","d2.meta":"📁 Sneakers &nbsp;·&nbsp; 👟 Condition: Used — very good, with original box<br>📊 Market researched: €1,150–1,900, median €1,450<br>💶 Price set automatically: €1,377.90 &nbsp;·&nbsp; 🖼 background removed ✓",
+"d3.title":"Nintendo Game Boy Advance · Silver (2001)","d3.meta":"📁 Retro gaming &nbsp;·&nbsp; 🎮 Condition: Used — tested, fully working<br>📊 Market researched: €70–140, median €100<br>💶 Price set automatically: €94.90 &nbsp;·&nbsp; 🖼 background removed ✓",
+"d4.title":"LEGO Pokémon 72153 Venusaur, Charizard &amp; Blastoise","d4.meta":"📁 LEGO sets &nbsp;·&nbsp; 🧱 Condition: New &amp; sealed — 6,838 pieces<br>📊 Market researched: €480–640, median €550<br>💶 Price set automatically: €522.90 &nbsp;·&nbsp; 🖼 background removed ✓",
+"sp.what":"Travis Scott × Nike SB \"Cactus Jack\" collab — bandana print, reversed brown swoosh and hidden extra laces.",
+"sp.t1":"<strong>February 28, 2020 · Release</strong><br>Sold out instantly — one of the most hyped SB Dunks ever.",
+"sp.t2":"<strong>Condition detected</strong><br>Used — very good, with original box (US 8.5 = EU 42).",
+"sp.t3":"<strong>✅ Live on eBay</strong><br>€1,377.90 — market median €1,450.",
+"gp.what":"Nintendo's 32-bit 6th-gen handheld in landscape format — home to classics from Mario to Zelda to Pokémon.",
+"gp.t1":"<strong>2001 · Launch</strong><br>Over 80 million GBA-family units sold worldwide.",
+"gp.t2":"<strong>Condition detected</strong><br>Used — tested, fully working.",
+"gp.t3":"<strong>✅ Live on eBay</strong><br>€94.90 — market median €100.",
+"lp.what":"Adult collector set (18+): the three final-form Kanto starters Venusaur, Charizard &amp; Blastoise on a display base.",
+"lp.t1":"<strong>6,838 pieces · 18+</strong><br>One of the largest Pokémon LEGO sets ever.",
+"lp.t2":"<strong>Condition detected</strong><br>New &amp; sealed (original box).",
+"lp.t3":"<strong>✅ Live on eBay</strong><br>€522.90 — market median €550.","chat.chip1":"✅ Publish","chat.chip2":"✏️ Price","chat.chip3":"🔁 Redo","chat.live":"✅ Your listing is live!",
+"how.title":"Snap. Confirm. Sold.","how.sub":"From stack to listing — you stay in control at every step.","how.n1":"STEP 1","how.h1":"Take photos","how.p1":"Anything goes: photos as an album to your Listo bot on Telegram. A short note — \"BIN 70 OBO 50\", \"auction from €1\", quantity — and it gets it.","how.n2":"STEP 2","how.h2":"Listo does the paperwork","how.p2":"Product identified, title and description written, category set with every required eBay field, market prices checked, photo cut out — for collectibles it even reads PSA labels off the slab. Everything that normally eats 10 minutes.","how.n3":"STEP 3","how.h3":"✅ and next card","how.p3":"Check the preview, tweak the price if you like — then ✅. Nothing ever goes live without your okay. And while it publishes, you're already shooting the next item.",
+"feat.title":"Built by a seller who was sick of typing.","feat.sub":"Listo knows the eBay traps other tools fail on — because we stepped into every one of them.","feat.h1":"Slab reader","feat.p1":"PSA, CGC, BGS — Listo reads grader, grade and cert number straight off the label. eBay's graded-card required fields fill themselves instead of you typing cert numbers.","feat.h2":"Live comps","feat.p2":"Before every listing, Listo checks comparable active offers: range, median, suggestion. You instantly see where the market sits — your asking price still always wins.","feat.h3":"Raw cards? Easy too.","feat.p3":"eBay's condition requirement for raw cards (Near Mint, played, …) — the thing that breaks bulk sellers — gets set automatically. No more clicking it a thousand times.","feat.h4":"Bulk without burnout","feat.p4":"Card after card, as fast as you can shoot. Collection liquidation, vault cleanout, selling your display pulls: the stack shrinks, not your weekend.","feat.h5":"Your store look","feat.p5":"Every photo is cut out and placed on your uniform background — any colour you want. Your profile looks like a store, not a flea market.","feat.h6":"Auction, BIN, Best Offer","feat.p6":"\"Auction from €1\", \"BIN €70 with offers from €50\", \"10 pieces at €2.50 each\" — write it in the caption, Listo executes it exactly.",
+"math.title":"The honest math.","math.sub":"Listing 100 items — by hand vs. with Listo.","math.m1t":"By hand","math.m2t":"With Listo","math.m1v":"~16 hours","math.m1d":"Writing titles, clicking 12 required fields, typing descriptions, comparing prices, cropping photos — ≈ 10 minutes per item. Two full workdays.","math.m2v":"~50 minutes","math.m2d":"Snap, caption, ✅ — the listing publishes while you grab the next item. The rest of your weekend is yours again.",
+"all.title":"What can I sell? Anything.","all.sub":"Listo is unbeatable on collectibles — but recognises any product you point it at.","all.c1":"🎴 Trading cards","all.c2":"👟 Sneakers","all.c3":"📱 Tech","all.c4":"🧸 Plush &amp; figures","all.c5":"🎮 Video games","all.c6":"🕰 Vintage &amp; retro","all.c7":"🧱 LEGO","all.c8":"⌚ Watches &amp; jewellery","all.c9":"👕 Fashion","all.c10":"📦 … literally anything","pr.title":"Set up first. Test it.<br>Then pay.","pr.sub":"Connect eBay and Telegram, do a test run with a real card — and decide afterwards. 14 days free, cancel anytime.","pr.unit":"/month","pr.unit2":"/month","pr.unit3":"/month","pr.badge":"Popular","pr.s1":"30 listings per month","pr.s2":"Slab reader &amp; live comps","pr.s3":"Auction, BIN &amp; Best Offer","pr.s4":"1 eBay account","pr.r1":"200 listings per month","pr.r2":"Everything in Starter","pr.r3":"Auto cutout with store look","pr.r4":"Sets, quantities &amp; bulk workflow","pr.r5":"Priority support","pr.b1":"Unlimited listings","pr.b2":"Everything in Reseller","pr.cta":"Try for free","pr.cta2":"Try for free","pr.cta3":"Try for free",
+"faq.title":"Frequently asked questions","faq.sub":"Honest answers — no fine print.","faq.q1":"Do I need an eBay developer account?","faq.a1":"No. You simply connect your regular eBay seller account — one click on \"Connect with eBay\", log in, confirm, done. Takes 30 seconds. Listo uses the official eBay interface and never sees your password.","faq.q2":"Can Listo publish anything without my okay?","faq.a2":"No, never. Every listing is shown to you as a preview on Telegram and only goes live when you tap ✅. You can revoke the eBay connection at any time in your eBay account.","faq.q3":"Does Listo really read PSA labels from the photo?","faq.a3":"Yes. Grader (PSA, CGC, BGS, …), grade and cert number are recognised straight from the slab label and entered into eBay's graded-card required fields. If a label isn't readable, the bot simply asks — it never guesses.","faq.q4":"What happens to my data and photos?","faq.a4":"Your photos are only processed to create your listing and deleted after publishing. Your eBay access permission is stored encrypted on servers in the EU. We don't sell data — our business model is your subscription, not your data.","faq.q5":"Which items work best?","faq.a5":"Listo specialises in collectibles: trading cards (Pokémon, One Piece, Yu-Gi-Oh — raw and graded), plush figures, video games and merchandise. But sneakers, tech and vintage work great too.","faq.q6":"Can I cancel anytime?","faq.a6":"Yes, cancel monthly with one click in your account — no minimum term, no notice period, no phone call needed.",
+"cta.title":"There's money lying around your place.<br>Photograph it.","cta.sub":"Setup in 3 minutes. You only pay once everything works.","cta.btn":"Start for free",
+"foot.copy":"© 2026 Listo · Made in Munich","foot.imprint":"Imprint","foot.privacy":"Privacy","foot.terms":"Terms","foot.contact":"Contact",
+"intro.skip":"Skip",
+"ph.h":"We're launching on Product Hunt soon.","ph.p":"Sign up to be the first to know — early birds get a surprise.","ph.ph":"your@email.com","ph.btn":"Notify me","ph.ok":"✓ You're on the list!"
+},
+es: {
+"nav.how":"Cómo funciona","nav.pricing":"Precios","nav.faq":"FAQ","nav.guide":"Guía","nav.login":"Iniciar sesión","nav.cta":"Empieza gratis",
+"hero.pill":"Tu vendedor IA para eBay","hero.h1":"Fotografía lo que sea.<br>Véndelo en eBay.","hero.sub":"Carta, consola, carrito de bebé — envía fotos a tu bot de Telegram. Listo reconoce el producto, escribe título, descripción y precio, y publica directamente en eBay tras tu ✅. Sin teclear ni una palabra.","hero.cta1":"Empieza gratis","hero.cta2":"Cómo funciona","hero.note":"14 días de prueba gratis · Solo pagas cuando todo está configurado y funcionando",
+"stats.v1":"~30 seg","stats.l1":"por anuncio","stats.l2":"teclear","stats.v3":"Cualquier producto","stats.l3":"de una carta a un sofá",
+"chat.status":"en línea","chat.front":"Anverso","chat.back":"Reverso","chat.title":"One Piece Luffy EB02-010 Dodgers Night PSA 10","chat.meta":"📁 Cartas TCG &nbsp;·&nbsp; 🏷 Graduada — PSA 10, cert. detectado ✓<br>📊 Mercado investigado: 3.400–4.900 €, mediana 3.800 €<br>💶 Precio fijado automáticamente: 3.609,90 € &nbsp;·&nbsp; 🖼 fondo eliminado ✓",
+"cp.title":"Monkey D. Luffy «Dodgers Night» · EB02-010 · PSA 10",
+"cp.what":"Reimpresión promocional oficial de la Anime 25th Collection [EB-02]: Luffy con la camiseta de los Dodgers, edición en inglés.",
+"cp.t1":"<strong>3 de julio de 2025 · Dodger Stadium, Los Ángeles</strong><br>Entregada a los asistentes con entrada en la «ONE PIECE Night» — los primeros 40.000 fans recibieron además el sombrero de paja de Luffy.",
+"cp.t2":"<strong>Graduación PSA</strong><br>Gem Mint 10 — Listo lee la nota y el certificado directamente de la etiqueta del slab.",
+"cp.t3":"<strong>Publicada con Listo</strong><br>Fotos al bot — anuncio de eBay terminado en ~30 segundos, precio investigado automáticamente.",
+"cp.t4":"<strong>✅ En línea en eBay</strong><br>3.609,90 € ¡Cómpralo ya! — mediana de mercado 3.800 €.",
+"dt.card":"Carta","dt.snk":"Zapatillas","dt.ctrl":"Game Boy","dt.lego":"LEGO",
+"d2.title":"Nike SB Dunk Low Travis Scott · EU 42","d2.meta":"📁 Zapatillas &nbsp;·&nbsp; 👟 Estado: Usado — muy bueno, con caja original<br>📊 Mercado investigado: 1.150–1.900 €, mediana 1.450 €<br>💶 Precio fijado automáticamente: 1.377,90 € &nbsp;·&nbsp; 🖼 fondo eliminado ✓",
+"d3.title":"Nintendo Game Boy Advance · Plata (2001)","d3.meta":"📁 Retro gaming &nbsp;·&nbsp; 🎮 Estado: Usado — probado, totalmente funcional<br>📊 Mercado investigado: 70–140 €, mediana 100 €<br>💶 Precio fijado automáticamente: 94,90 € &nbsp;·&nbsp; 🖼 fondo eliminado ✓",
+"d4.title":"LEGO Pokémon 72153 Venusaur, Charizard y Blastoise","d4.meta":"📁 Sets LEGO &nbsp;·&nbsp; 🧱 Estado: Nuevo y precintado — 6.838 piezas<br>📊 Mercado investigado: 480–640 €, mediana 550 €<br>💶 Precio fijado automáticamente: 522,90 € &nbsp;·&nbsp; 🖼 fondo eliminado ✓",
+"sp.what":"Colaboración Travis Scott × Nike SB «Cactus Jack» — estampado bandana, swoosh marrón invertido y cordones extra ocultos.",
+"sp.t1":"<strong>28 de febrero de 2020 · Lanzamiento</strong><br>Agotado al instante — uno de los SB Dunk más codiciados de la historia.",
+"sp.t2":"<strong>Estado detectado</strong><br>Usado — muy bueno, con caja original (US 8.5 = EU 42).",
+"sp.t3":"<strong>✅ En línea en eBay</strong><br>1.377,90 € — mediana de mercado 1.450 €.",
+"gp.what":"El portátil de 32 bits de 6ª generación de Nintendo en formato horizontal — hogar de clásicos de Mario a Pokémon.",
+"gp.t1":"<strong>2001 · Lanzamiento</strong><br>Más de 80 millones de unidades de la familia GBA vendidas en todo el mundo.",
+"gp.t2":"<strong>Estado detectado</strong><br>Usado — probado, totalmente funcional.",
+"gp.t3":"<strong>✅ En línea en eBay</strong><br>94,90 € — mediana de mercado 100 €.",
+"lp.what":"Set de coleccionista para adultos (18+): los tres iniciales finales de Kanto Venusaur, Charizard y Blastoise sobre una peana.",
+"lp.t1":"<strong>6.838 piezas · 18+</strong><br>Uno de los sets LEGO de Pokémon más grandes jamás creados.",
+"lp.t2":"<strong>Estado detectado</strong><br>Nuevo y precintado (caja original).",
+"lp.t3":"<strong>✅ En línea en eBay</strong><br>522,90 € — mediana de mercado 550 €.","chat.chip1":"✅ Publicar","chat.chip2":"✏️ Precio","chat.chip3":"🔁 Repetir","chat.live":"✅ ¡Tu anuncio está en línea!",
+"how.title":"Foto. Confirmar. Vendido.","how.sub":"Del montón al anuncio — tú mantienes el control en cada paso.","how.n1":"PASO 1","how.h1":"Fotografía","how.p1":"Lo que sea: fotos como álbum a tu bot de Listo en Telegram. Una nota corta — «BIN 70 con ofertas desde 50», «subasta desde 1 €», cantidad — y la entiende.","how.n2":"PASO 2","how.h2":"Listo hace el papeleo","how.p2":"Producto identificado, título y descripción escritos, categoría con todos los campos obligatorios de eBay, precios comprobados, foto recortada — en coleccionables hasta lee etiquetas PSA del slab. Todo lo que normalmente cuesta 10 minutos.","how.n3":"PASO 3","how.h3":"✅ y siguiente carta","how.p3":"Revisa la vista previa, ajusta el precio si quieres — y ✅. Nada se publica jamás sin tu visto bueno. Y mientras se publica, ya estás fotografiando el siguiente artículo.",
+"feat.title":"Creado por un vendedor harto de teclear.","feat.sub":"Listo conoce las trampas de eBay donde fallan otras herramientas — porque caímos en todas.","feat.h1":"Lector de slabs","feat.p1":"PSA, CGC, BGS — Listo lee calificador, nota y número de certificado directamente de la etiqueta. Los campos obligatorios de eBay para cartas graduadas se rellenan solos.","feat.h2":"Comps en vivo","feat.p2":"Antes de cada anuncio, Listo revisa ofertas activas comparables: rango, mediana, sugerencia. Ves al instante dónde está el mercado — tu precio siempre tiene la última palabra.","feat.h3":"¿Cartas raw? También fácil.","feat.p3":"El requisito de estado de eBay para cartas sueltas (Near Mint, jugada, …) — lo que desespera a los vendedores bulk — se establece automáticamente. Se acabó hacer mil clics.","feat.h4":"Bulk sin burnout","feat.p4":"Carta tras carta, tan rápido como fotografíes. Liquidación de colección, limpieza del vault, ventas de pulls: el montón encoge, no tu fin de semana.","feat.h5":"Tu imagen de tienda","feat.p5":"Cada foto se recorta y se coloca sobre tu fondo uniforme — el color que quieras. Tu perfil parece una tienda, no un mercadillo.","feat.h6":"Subasta, BIN, Mejor oferta","feat.p6":"«Subasta desde 1 €», «BIN 70 € con ofertas desde 50 €», «10 unidades a 2,50 €» — escríbelo en la nota y Listo lo ejecuta exactamente.",
+"math.title":"Las cuentas honestas.","math.sub":"Publicar 100 artículos — a mano vs. con Listo.","math.m1t":"A mano","math.m2t":"Con Listo","math.m1v":"~16 horas","math.m1d":"Redactar títulos, clicar 12 campos obligatorios, teclear descripciones, comparar precios, recortar fotos — ≈ 10 minutos por artículo. Dos jornadas completas.","math.m2v":"~50 minutos","math.m2d":"Foto, nota, ✅ — el anuncio se publica mientras coges el siguiente artículo. El resto del finde vuelve a ser tuyo.",
+"all.title":"¿Qué puedo vender? Todo.","all.sub":"Listo es imbatible en coleccionables — pero reconoce cualquier producto que le pongas delante.","all.c1":"🎴 Cartas TCG","all.c2":"👟 Zapatillas","all.c3":"📱 Tecnología","all.c4":"🧸 Peluches y figuras","all.c5":"🎮 Videojuegos","all.c6":"🕰 Vintage y retro","all.c7":"🧱 LEGO","all.c8":"⌚ Relojes y joyas","all.c9":"👕 Moda","all.c10":"📦 … literalmente todo","pr.title":"Primero configura. Luego prueba.<br>Después paga.","pr.sub":"Conectas eBay y Telegram, haces una prueba con una carta real — y decides después. 14 días gratis, cancela cuando quieras.","pr.unit":"/mes","pr.unit2":"/mes","pr.unit3":"/mes","pr.badge":"Popular","pr.s1":"30 anuncios al mes","pr.s2":"Lector de slabs y comps en vivo","pr.s3":"Subasta, BIN y Mejor oferta","pr.s4":"1 cuenta de eBay","pr.r1":"200 anuncios al mes","pr.r2":"Todo lo de Starter","pr.r3":"Recorte automático con imagen de tienda","pr.r4":"Sets, cantidades y flujo bulk","pr.r5":"Soporte prioritario","pr.b1":"Anuncios ilimitados","pr.b2":"Todo lo de Reseller","pr.cta":"Prueba gratis","pr.cta2":"Prueba gratis","pr.cta3":"Prueba gratis",
+"faq.title":"Preguntas frecuentes","faq.sub":"Respuestas honestas — sin letra pequeña.","faq.q1":"¿Necesito una cuenta de desarrollador de eBay?","faq.a1":"No. Simplemente conectas tu cuenta normal de vendedor de eBay — un clic en «Conectar con eBay», inicias sesión, confirmas y listo. Tarda 30 segundos. Listo usa la interfaz oficial de eBay y nunca ve tu contraseña.","faq.q2":"¿Puede Listo publicar algo sin mi visto bueno?","faq.a2":"No, nunca. Cada anuncio se te muestra como vista previa en Telegram y solo se publica cuando tocas ✅. Puedes revocar la conexión con eBay en cualquier momento desde tu cuenta.","faq.q3":"¿De verdad Listo lee etiquetas PSA de la foto?","faq.a3":"Sí. Calificador (PSA, CGC, BGS, …), nota y número de certificado se reconocen directamente de la etiqueta del slab y se introducen en los campos obligatorios de eBay. Si una etiqueta no se lee bien, el bot pregunta — nunca adivina.","faq.q4":"¿Qué pasa con mis datos y fotos?","faq.a4":"Tus fotos solo se procesan para crear tu anuncio y se eliminan tras la publicación. Tu permiso de acceso a eBay se guarda cifrado en servidores de la UE. No vendemos datos — nuestro modelo de negocio es tu suscripción, no tus datos.","faq.q5":"¿Qué artículos funcionan mejor?","faq.a5":"Listo está especializado en coleccionables: cartas (Pokémon, One Piece, Yu-Gi-Oh — raw y graduadas), peluches, videojuegos y merchandising. Pero zapatillas, tecnología y vintage también funcionan de maravilla.","faq.q6":"¿Puedo cancelar en cualquier momento?","faq.a6":"Sí, cancelación mensual con un clic en tu cuenta — sin permanencia, sin plazo de preaviso, sin llamadas.",
+"cta.title":"En tu casa hay dinero tirado.<br>Fotografíalo.","cta.sub":"Configuración en 3 minutos. Solo pagas cuando todo funciona.","cta.btn":"Empieza gratis",
+"foot.copy":"© 2026 Listo · Hecho en Múnich","foot.imprint":"Aviso legal","foot.privacy":"Privacidad","foot.terms":"Condiciones","foot.contact":"Contacto",
+"intro.skip":"Saltar",
+"ph.h":"Pronto lanzamos en Product Hunt.","ph.p":"Apúntate y entérate el primero — los early birds reciben una sorpresa.","ph.ph":"tu@email.com","ph.btn":"Avísame","ph.ok":"✓ ¡Estás en la lista!"
+},
+it: {
+"nav.how":"Come funziona","nav.pricing":"Prezzi","nav.faq":"FAQ","nav.guide":"Guida","nav.login":"Accedi","nav.cta":"Inizia gratis",
+"hero.pill":"Il tuo venditore IA per eBay","hero.h1":"Fotografa qualsiasi cosa.<br>Vendila su eBay.","hero.sub":"Carta, console, passeggino — manda le foto al tuo bot Telegram. Listo riconosce il prodotto, scrive titolo, descrizione e prezzo e pubblica direttamente su eBay dopo il tuo ✅. Senza digitare una parola.","hero.cta1":"Inizia gratis","hero.cta2":"Come funziona","hero.note":"14 giorni di prova gratuita · Paghi solo quando tutto è configurato e funziona",
+"stats.v1":"~30 sec","stats.l1":"per annuncio","stats.l2":"digitazione","stats.v3":"Qualsiasi prodotto","stats.l3":"dalla carta al divano",
+"chat.status":"online","chat.front":"Fronte","chat.back":"Retro","chat.title":"One Piece Luffy EB02-010 Dodgers Night PSA 10","chat.meta":"📁 Carte TCG &nbsp;·&nbsp; 🏷 Gradata — PSA 10, cert. rilevato ✓<br>📊 Mercato analizzato: 3.400–4.900 €, mediana 3.800 €<br>💶 Prezzo impostato automaticamente: 3.609,90 € &nbsp;·&nbsp; 🖼 scontornato ✓",
+"cp.title":"Monkey D. Luffy «Dodgers Night» · EB02-010 · PSA 10",
+"cp.what":"Ristampa promozionale ufficiale dalla Anime 25th Collection [EB-02]: Luffy con la maglia dei Dodgers, edizione inglese.",
+"cp.t1":"<strong>3 luglio 2025 · Dodger Stadium, Los Angeles</strong><br>Consegnata ai possessori di biglietto alla «ONE PIECE Night» — i primi 40.000 fan hanno ricevuto anche il cappello di paglia di Luffy.",
+"cp.t2":"<strong>Gradazione PSA</strong><br>Gem Mint 10 — Listo legge voto e certificato direttamente dall'etichetta dello slab.",
+"cp.t3":"<strong>Messa in vendita con Listo</strong><br>Foto al bot — annuncio eBay completo in ~30 secondi, prezzo ricercato automaticamente.",
+"cp.t4":"<strong>✅ Online su eBay</strong><br>3.609,90 € Compralo Subito — mediana di mercato 3.800 €.",
+"dt.card":"Carta","dt.snk":"Sneaker","dt.ctrl":"Game Boy","dt.lego":"LEGO",
+"d2.title":"Nike SB Dunk Low Travis Scott · EU 42","d2.meta":"📁 Sneaker &nbsp;·&nbsp; 👟 Condizione: Usato — ottimo stato, con scatola originale<br>📊 Mercato analizzato: 1.150–1.900 €, mediana 1.450 €<br>💶 Prezzo impostato automaticamente: 1.377,90 € &nbsp;·&nbsp; 🖼 scontornato ✓",
+"d3.title":"Nintendo Game Boy Advance · Argento (2001)","d3.meta":"📁 Retro gaming &nbsp;·&nbsp; 🎮 Condizione: Usato — testato, perfettamente funzionante<br>📊 Mercato analizzato: 70–140 €, mediana 100 €<br>💶 Prezzo impostato automaticamente: 94,90 € &nbsp;·&nbsp; 🖼 scontornato ✓",
+"d4.title":"LEGO Pokémon 72153 Venusaur, Charizard e Blastoise","d4.meta":"📁 Set LEGO &nbsp;·&nbsp; 🧱 Condizione: Nuovo e sigillato — 6.838 pezzi<br>📊 Mercato analizzato: 480–640 €, mediana 550 €<br>💶 Prezzo impostato automaticamente: 522,90 € &nbsp;·&nbsp; 🖼 scontornato ✓",
+"sp.what":"Collaborazione Travis Scott × Nike SB «Cactus Jack» — fantasia bandana, swoosh marrone invertito e lacci extra nascosti.",
+"sp.t1":"<strong>28 febbraio 2020 · Uscita</strong><br>Sold out all'istante — una delle SB Dunk più hypate di sempre.",
+"sp.t2":"<strong>Condizione rilevata</strong><br>Usato — ottimo stato, con scatola originale (US 8.5 = EU 42).",
+"sp.t3":"<strong>✅ Online su eBay</strong><br>1.377,90 € — mediana di mercato 1.450 €.",
+"gp.what":"Il palmare a 32 bit di 6ª generazione di Nintendo in formato orizzontale — casa di classici da Mario a Pokémon.",
+"gp.t1":"<strong>2001 · Lancio</strong><br>Oltre 80 milioni di unità della famiglia GBA vendute nel mondo.",
+"gp.t2":"<strong>Condizione rilevata</strong><br>Usato — testato, perfettamente funzionante.",
+"gp.t3":"<strong>✅ Online su eBay</strong><br>94,90 € — mediana di mercato 100 €.",
+"lp.what":"Set da collezione per adulti (18+): i tre starter finali di Kanto Venusaur, Charizard e Blastoise su una base espositiva.",
+"lp.t1":"<strong>6.838 pezzi · 18+</strong><br>Uno dei più grandi set LEGO Pokémon mai realizzati.",
+"lp.t2":"<strong>Condizione rilevata</strong><br>Nuovo e sigillato (scatola originale).",
+"lp.t3":"<strong>✅ Online su eBay</strong><br>522,90 € — mediana di mercato 550 €.","chat.chip1":"✅ Pubblica","chat.chip2":"✏️ Prezzo","chat.chip3":"🔁 Rigenera","chat.live":"✅ Il tuo annuncio è online!",
+"how.title":"Scatta. Conferma. Venduto.","how.sub":"Dalla pila all'annuncio — il controllo resta a te, a ogni passaggio.","how.n1":"PASSO 1","how.h1":"Fotografa","how.p1":"Qualsiasi cosa: foto come album al tuo bot Listo su Telegram. Una breve nota — «BIN 70 con proposte da 50», «asta da 1 €», quantità — e la capisce.","how.n2":"PASSO 2","how.h2":"Listo fa la burocrazia","how.p2":"Prodotto identificato, titolo e descrizione scritti, categoria con tutti i campi obbligatori di eBay, prezzi controllati, foto scontornata — sul collezionismo legge perfino le etichette PSA dallo slab. Tutto ciò che di solito ti costa 10 minuti.","how.n3":"PASSO 3","how.h3":"✅ e prossima carta","how.p3":"Controlla l'anteprima, ritocca il prezzo se vuoi — poi ✅. Nulla va mai online senza il tuo ok. E mentre l'annuncio si pubblica, stai già fotografando il prossimo articolo.",
+"feat.title":"Creato da un seller stufo di digitare.","feat.sub":"Listo conosce le trappole di eBay su cui falliscono gli altri strumenti — perché ci siamo cascati tutti.","feat.h1":"Lettore di slab","feat.p1":"PSA, CGC, BGS — Listo legge valutatore, voto e numero di certificazione direttamente dall'etichetta. I campi obbligatori di eBay per le carte gradate si compilano da soli.","feat.h2":"Comps live","feat.p2":"Prima di ogni annuncio, Listo controlla le offerte attive comparabili: range, mediana, suggerimento. Vedi subito dove sta il mercato — il tuo prezzo ha comunque sempre l'ultima parola.","feat.h3":"Carte raw? Facilissimo.","feat.p3":"Il requisito di condizione di eBay per le carte sciolte (Near Mint, giocata, …) — l'incubo dei venditori bulk — viene impostato automaticamente. Basta mille clic.","feat.h4":"Bulk senza burnout","feat.p4":"Carta dopo carta, veloce quanto scatti. Liquidazione di collezioni, svuotamento del vault, vendita delle pull: la pila si riduce, non il tuo weekend.","feat.h5":"Il look del tuo store","feat.p5":"Ogni foto viene scontornata e posizionata sul tuo sfondo uniforme — colore a scelta. Il tuo profilo sembra uno store, non un mercatino.","feat.h6":"Asta, BIN, proposta d'acquisto","feat.p6":"«Asta da 1 €», «BIN 70 € con proposte da 50 €», «10 pezzi a 2,50 €» — scrivilo nella didascalia, Listo lo esegue alla lettera.",
+"math.title":"I conti onesti.","math.sub":"Pubblicare 100 articoli — a mano vs. con Listo.","math.m1t":"A mano","math.m2t":"Con Listo","math.m1v":"~16 ore","math.m1d":"Scrivere titoli, cliccare 12 campi obbligatori, digitare descrizioni, confrontare prezzi, ritagliare foto — ≈ 10 minuti ad articolo. Due giornate piene.","math.m2v":"~50 minuti","math.m2d":"Scatto, didascalia, ✅ — l'annuncio si pubblica mentre prendi il prossimo articolo. Il resto del weekend torna tuo.",
+"all.title":"Cosa posso vendere? Tutto.","all.sub":"Listo è imbattibile sul collezionismo — ma riconosce qualsiasi prodotto gli mostri.","all.c1":"🎴 Carte TCG","all.c2":"👟 Sneaker","all.c3":"📱 Tecnologia","all.c4":"🧸 Peluche e figure","all.c5":"🎮 Videogiochi","all.c6":"🕰 Vintage e retrò","all.c7":"🧱 LEGO","all.c8":"⌚ Orologi e gioielli","all.c9":"👕 Moda","all.c10":"📦 … letteralmente tutto","pr.title":"Prima configuri. Poi provi.<br>Poi paghi.","pr.sub":"Colleghi eBay e Telegram, fai una prova con una carta vera — e decidi dopo. 14 giorni gratis, disdici quando vuoi.","pr.unit":"/mese","pr.unit2":"/mese","pr.unit3":"/mese","pr.badge":"Popolare","pr.s1":"30 annunci al mese","pr.s2":"Lettore di slab e comps live","pr.s3":"Asta, BIN e proposta d'acquisto","pr.s4":"1 account eBay","pr.r1":"200 annunci al mese","pr.r2":"Tutto di Starter","pr.r3":"Scontorno automatico con look da store","pr.r4":"Set, quantità e flusso bulk","pr.r5":"Supporto prioritario","pr.b1":"Annunci illimitati","pr.b2":"Tutto di Reseller","pr.cta":"Prova gratis","pr.cta2":"Prova gratis","pr.cta3":"Prova gratis",
+"faq.title":"Domande frequenti","faq.sub":"Risposte oneste — niente clausole nascoste.","faq.q1":"Mi serve un account sviluppatore eBay?","faq.a1":"No. Colleghi semplicemente il tuo normale account venditore eBay — un clic su «Collega con eBay», accedi, confermi, fatto. Ci vogliono 30 secondi. Listo usa l'interfaccia ufficiale di eBay e non vede mai la tua password.","faq.q2":"Listo può pubblicare qualcosa senza il mio ok?","faq.a2":"No, mai. Ogni annuncio ti viene mostrato in anteprima su Telegram e va online solo quando tocchi ✅. Puoi revocare il collegamento a eBay in qualsiasi momento dal tuo account.","faq.q3":"Listo legge davvero le etichette PSA dalla foto?","faq.a3":"Sì. Valutatore (PSA, CGC, BGS, …), voto e numero di certificazione vengono riconosciuti direttamente dall'etichetta dello slab e inseriti nei campi obbligatori di eBay. Se un'etichetta non è leggibile, il bot chiede — non indovina mai.","faq.q4":"Cosa succede ai miei dati e alle mie foto?","faq.a4":"Le tue foto vengono elaborate solo per creare il tuo annuncio ed eliminate dopo la pubblicazione. La tua autorizzazione eBay è salvata cifrata su server nell'UE. Non vendiamo dati — il nostro modello di business è il tuo abbonamento, non i tuoi dati.","faq.q5":"Quali articoli funzionano meglio?","faq.a5":"Listo è specializzato in collezionismo: carte (Pokémon, One Piece, Yu-Gi-Oh — raw e gradate), peluche, videogiochi e merchandising. Ma anche sneaker, tecnologia e vintage funzionano benissimo.","faq.q6":"Posso disdire in qualsiasi momento?","faq.a6":"Sì, disdetta mensile con un clic nel tuo account — nessun vincolo, nessun preavviso, nessuna telefonata.",
+"cta.title":"A casa tua ci sono soldi in giro.<br>Fotografali.","cta.sub":"Configurazione in 3 minuti. Paghi solo quando tutto funziona.","cta.btn":"Inizia gratis",
+"foot.copy":"© 2026 Listo · Fatto a Monaco","foot.imprint":"Note legali","foot.privacy":"Privacy","foot.terms":"Termini","foot.contact":"Contatti",
+"intro.skip":"Salta",
+"ph.h":"Presto lanciamo su Product Hunt.","ph.p":"Iscriviti e sappilo per primo — gli early bird ricevono una sorpresa.","ph.ph":"tua@email.com","ph.btn":"Avvisami","ph.ok":"✓ Sei in lista!"
+},
+fr: {
+"nav.how":"Comment ça marche","nav.pricing":"Tarifs","nav.faq":"FAQ","nav.guide":"Guide","nav.login":"Connexion","nav.cta":"Commencer gratuitement",
+"hero.pill":"Votre vendeur IA pour eBay","hero.h1":"Photographiez n'importe quoi.<br>Vendez-le sur eBay.","hero.sub":"Carte, console, poussette — envoyez simplement des photos à votre bot Telegram. Listo reconnaît le produit, rédige titre, description et prix, et publie directement sur eBay après votre ✅. Sans taper un seul mot.","hero.cta1":"Commencer gratuitement","hero.cta2":"Comment ça marche","hero.note":"14 jours d'essai gratuit · Vous ne payez que lorsque tout est configuré et fonctionne",
+"stats.v1":"~30 sec","stats.l1":"par annonce","stats.l2":"saisie","stats.v3":"Tout produit","stats.l3":"de la carte au canapé",
+"chat.status":"en ligne","chat.front":"Recto","chat.back":"Verso","chat.title":"One Piece Luffy EB02-010 Dodgers Night PSA 10","chat.meta":"📁 Cartes TCG &nbsp;·&nbsp; 🏷 Gradée — PSA 10, cert. détecté ✓<br>📊 Marché analysé : 3 400–4 900 €, médiane 3 800 €<br>💶 Prix fixé automatiquement : 3 609,90 € &nbsp;·&nbsp; 🖼 détouré ✓",
+"cp.title":"Monkey D. Luffy « Dodgers Night » · EB02-010 · PSA 10",
+"cp.what":"Réimpression promotionnelle officielle de l'Anime 25th Collection [EB-02] : Luffy en maillot des Dodgers, édition anglaise.",
+"cp.t1":"<strong>3 juillet 2025 · Dodger Stadium, Los Angeles</strong><br>Remise aux spectateurs munis d'un billet lors de la « ONE PIECE Night » — les 40 000 premiers fans ont aussi reçu le chapeau de paille de Luffy.",
+"cp.t2":"<strong>Gradation PSA</strong><br>Gem Mint 10 — Listo lit la note et le certificat directement sur l'étiquette du slab.",
+"cp.t3":"<strong>Mise en vente avec Listo</strong><br>Photos au bot — annonce eBay complète en ~30 secondes, prix étudié automatiquement.",
+"cp.t4":"<strong>✅ En ligne sur eBay</strong><br>3 609,90 € Achat immédiat — médiane du marché 3 800 €.",
+"dt.card":"Carte","dt.snk":"Sneakers","dt.ctrl":"Game Boy","dt.lego":"LEGO",
+"d2.title":"Nike SB Dunk Low Travis Scott · EU 42","d2.meta":"📁 Sneakers &nbsp;·&nbsp; 👟 État : Occasion — très bon état, avec boîte d'origine<br>📊 Marché analysé : 1 150–1 900 €, médiane 1 450 €<br>💶 Prix fixé automatiquement : 1 377,90 € &nbsp;·&nbsp; 🖼 détouré ✓",
+"d3.title":"Nintendo Game Boy Advance · Argent (2001)","d3.meta":"📁 Rétro gaming &nbsp;·&nbsp; 🎮 État : Occasion — testée, parfaitement fonctionnelle<br>📊 Marché analysé : 70–140 €, médiane 100 €<br>💶 Prix fixé automatiquement : 94,90 € &nbsp;·&nbsp; 🖼 détouré ✓",
+"d4.title":"LEGO Pokémon 72153 Florizarre, Dracaufeu &amp; Tortank","d4.meta":"📁 Sets LEGO &nbsp;·&nbsp; 🧱 État : Neuf et scellé — 6 838 pièces<br>📊 Marché analysé : 480–640 €, médiane 550 €<br>💶 Prix fixé automatiquement : 522,90 € &nbsp;·&nbsp; 🖼 détouré ✓",
+"sp.what":"Collaboration Travis Scott × Nike SB « Cactus Jack » — motif bandana, swoosh marron inversé et lacets supplémentaires cachés.",
+"sp.t1":"<strong>28 février 2020 · Sortie</strong><br>Épuisée instantanément — l'une des SB Dunk les plus hypées de tous les temps.",
+"sp.t2":"<strong>État détecté</strong><br>Occasion — très bon état, avec boîte d'origine (US 8.5 = EU 42).",
+"sp.t3":"<strong>✅ En ligne sur eBay</strong><br>1 377,90 € — médiane du marché 1 450 €.",
+"gp.what":"La console portable 32 bits de 6e génération de Nintendo au format paysage — terre des classiques de Mario à Pokémon.",
+"gp.t1":"<strong>2001 · Lancement</strong><br>Plus de 80 millions d'unités de la famille GBA vendues dans le monde.",
+"gp.t2":"<strong>État détecté</strong><br>Occasion — testée, parfaitement fonctionnelle.",
+"gp.t3":"<strong>✅ En ligne sur eBay</strong><br>94,90 € — médiane du marché 100 €.",
+"lp.what":"Set de collection pour adultes (18+) : les trois starters finaux de Kanto Florizarre, Dracaufeu &amp; Tortank sur un socle d'exposition.",
+"lp.t1":"<strong>6 838 pièces · 18+</strong><br>L'un des plus grands sets LEGO Pokémon jamais créés.",
+"lp.t2":"<strong>État détecté</strong><br>Neuf et scellé (boîte d'origine).",
+"lp.t3":"<strong>✅ En ligne sur eBay</strong><br>522,90 € — médiane du marché 550 €.","chat.chip1":"✅ Publier","chat.chip2":"✏️ Prix","chat.chip3":"🔁 Refaire","chat.live":"✅ Votre annonce est en ligne !",
+"how.title":"Photographiez. Confirmez. Vendu.","how.sub":"De la pile à l'annonce — vous gardez le contrôle à chaque étape.","how.n1":"ÉTAPE 1","how.h1":"Photographiez","how.p1":"N'importe quoi : des photos en album à votre bot Listo sur Telegram. Une courte note — « BIN 70 avec offres dès 50 », « enchère dès 1 € », quantité — il comprend.","how.n2":"ÉTAPE 2","how.h2":"Listo fait la paperasse","how.p2":"Produit identifié, titre et description rédigés, catégorie avec tous les champs obligatoires d'eBay, prix vérifiés, photo détourée — sur les objets de collection, il lit même les étiquettes PSA sur le slab. Tout ce qui vous coûte normalement 10 minutes.","how.n3":"ÉTAPE 3","how.h3":"✅ et carte suivante","how.p3":"Vérifiez l'aperçu, ajustez le prix si besoin — puis ✅. Rien n'est jamais publié sans votre accord. Et pendant la publication, vous photographiez déjà l'article suivant.",
+"feat.title":"Créé par un vendeur qui en avait marre de taper.","feat.sub":"Listo connaît les pièges d'eBay où échouent les autres outils — parce qu'on est tombés dans chacun d'eux.","feat.h1":"Lecteur de slabs","feat.p1":"PSA, CGC, BGS — Listo lit l'évaluateur, la note et le numéro de certification directement sur l'étiquette. Les champs obligatoires d'eBay pour cartes gradées se remplissent tout seuls.","feat.h2":"Comps en direct","feat.p2":"Avant chaque annonce, Listo vérifie les offres actives comparables : fourchette, médiane, suggestion. Vous voyez instantanément où en est le marché — votre prix garde toujours le dernier mot.","feat.h3":"Cartes raw ? Facile aussi.","feat.p3":"L'exigence d'état d'eBay pour les cartes brutes (Near Mint, jouée, …) — le cauchemar des vendeurs bulk — est définie automatiquement. Fini les mille clics.","feat.h4":"Du bulk sans burnout","feat.p4":"Carte après carte, aussi vite que vous photographiez. Liquidation de collection, vidage de vault, vente de pulls : la pile rétrécit, pas votre week-end.","feat.h5":"Votre image de boutique","feat.p5":"Chaque photo est détourée et placée sur votre fond uniforme — couleur au choix. Votre profil ressemble à une boutique, pas à un vide-grenier.","feat.h6":"Enchère, BIN, meilleure offre","feat.p6":"« Enchère dès 1 € », « BIN 70 € avec offres dès 50 € », « 10 pièces à 2,50 € » — écrivez-le dans la légende, Listo l'exécute à la lettre.",
+"math.title":"Le calcul honnête.","math.sub":"Mettre en vente 100 articles — à la main vs. avec Listo.","math.m1t":"À la main","math.m2t":"Avec Listo","math.m1v":"~16 heures","math.m1d":"Rédiger les titres, cliquer 12 champs obligatoires, taper les descriptions, comparer les prix, recadrer les photos — ≈ 10 minutes par article. Deux journées complètes.","math.m2v":"~50 minutes","math.m2d":"Photo, légende, ✅ — l'annonce se publie pendant que vous prenez l'article suivant. Le reste de votre week-end vous appartient à nouveau.",
+"all.title":"Que puis-je vendre ? Tout.","all.sub":"Listo est imbattable sur les objets de collection — mais reconnaît tout produit que vous lui montrez.","all.c1":"🎴 Cartes TCG","all.c2":"👟 Sneakers","all.c3":"📱 Tech","all.c4":"🧸 Peluches et figurines","all.c5":"🎮 Jeux vidéo","all.c6":"🕰 Vintage et rétro","all.c7":"🧱 LEGO","all.c8":"⌚ Montres et bijoux","all.c9":"👕 Mode","all.c10":"📦 … littéralement tout","pr.title":"Configurez d'abord. Testez.<br>Payez ensuite.","pr.sub":"Vous connectez eBay et Telegram, faites un essai avec une vraie carte — et décidez après. 14 jours gratuits, résiliable à tout moment.","pr.unit":"/mois","pr.unit2":"/mois","pr.unit3":"/mois","pr.badge":"Populaire","pr.s1":"30 annonces par mois","pr.s2":"Lecteur de slabs et comps en direct","pr.s3":"Enchère, BIN et meilleure offre","pr.s4":"1 compte eBay","pr.r1":"200 annonces par mois","pr.r2":"Tout Starter inclus","pr.r3":"Détourage auto avec image de boutique","pr.r4":"Lots, quantités et flux bulk","pr.r5":"Support prioritaire","pr.b1":"Annonces illimitées","pr.b2":"Tout Reseller inclus","pr.cta":"Essayer gratuitement","pr.cta2":"Essayer gratuitement","pr.cta3":"Essayer gratuitement",
+"faq.title":"Questions fréquentes","faq.sub":"Des réponses honnêtes — sans petites lignes.","faq.q1":"Ai-je besoin d'un compte développeur eBay ?","faq.a1":"Non. Vous connectez simplement votre compte vendeur eBay habituel — un clic sur « Connecter avec eBay », connexion, confirmation, terminé. 30 secondes. Listo utilise l'interface officielle d'eBay et ne voit jamais votre mot de passe.","faq.q2":"Listo peut-il publier sans mon accord ?","faq.a2":"Non, jamais. Chaque annonce vous est présentée en aperçu sur Telegram et n'est publiée que lorsque vous appuyez sur ✅. Vous pouvez révoquer la connexion eBay à tout moment depuis votre compte.","faq.q3":"Listo lit-il vraiment les étiquettes PSA sur la photo ?","faq.a3":"Oui. L'évaluateur (PSA, CGC, BGS, …), la note et le numéro de certification sont reconnus directement sur l'étiquette du slab et saisis dans les champs obligatoires d'eBay. Si une étiquette est illisible, le bot demande — il ne devine jamais.","faq.q4":"Que deviennent mes données et photos ?","faq.a4":"Vos photos ne sont traitées que pour créer votre annonce et supprimées après publication. Votre autorisation d'accès eBay est stockée chiffrée sur des serveurs dans l'UE. Nous ne vendons pas de données — notre modèle économique, c'est votre abonnement, pas vos données.","faq.q5":"Quels articles fonctionnent le mieux ?","faq.a5":"Listo est spécialisé dans les objets de collection : cartes (Pokémon, One Piece, Yu-Gi-Oh — raw et gradées), peluches, jeux vidéo et merchandising. Mais les sneakers, la tech et le vintage fonctionnent aussi très bien.","faq.q6":"Puis-je résilier à tout moment ?","faq.a6":"Oui, résiliation mensuelle en un clic dans votre compte — sans engagement, sans préavis, sans appel téléphonique.",
+"cta.title":"De l'argent traîne chez vous.<br>Photographiez-le.","cta.sub":"Configuration en 3 minutes. Vous ne payez que lorsque tout fonctionne.","cta.btn":"Commencer gratuitement",
+"foot.copy":"© 2026 Listo · Fait à Munich","foot.imprint":"Mentions légales","foot.privacy":"Confidentialité","foot.terms":"CGV","foot.contact":"Contact",
+"intro.skip":"Passer",
+"ph.h":"Nous lançons bientôt sur Product Hunt.","ph.p":"Inscrivez-vous pour être informé en premier — les early birds auront une surprise.","ph.ph":"votre@email.com","ph.btn":"Prévenez-moi","ph.ok":"✓ Vous êtes sur la liste !"
+}
+};
+
+const de = {};
+document.querySelectorAll("[data-i18n]").forEach(el => { de[el.dataset.i18n] = el.innerHTML; });
+T.de = de;
+
+function setLang(lang) {
+  const dict = T[lang] || T.de;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const value = dict[el.dataset.i18n];
+    if (value !== undefined) el.innerHTML = value;
+  });
+  document.documentElement.lang = lang;
+  localStorage.setItem("listo-lang", lang);
+  document.getElementById("lang").value = lang;
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("listo-theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+
+applyTheme(localStorage.getItem("listo-theme")
+  || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+setLang(localStorage.getItem("listo-lang") || "en");
+
+(async () => {
+  try {
+    const resp = await fetch("/api/me", { credentials: "same-origin" });
+    if (!resp.ok) return;
+    const me = await resp.json();
+    document.getElementById("navLogin").style.display = "none";
+    document.getElementById("navCta").style.display = "none";
+    document.getElementById("navProfile").style.display = "inline-block";
+  } catch (e) { /* Server offline: Buttons bleiben */ }
+})();
+
+async function phNotify(ev) {
+  ev.preventDefault();
+  const email = document.getElementById("phEmail").value.trim();
+  try {
+    await fetch("/api/launch-notify", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    document.getElementById("phForm").style.display = "none";
+    document.getElementById("phOk").style.display = "block";
+  } catch (e) { /* offline: still */ }
+}
+
+// Intro-Splash: einmal pro Sitzung, klick = überspringen
+function endIntro() {
+  const splash = document.getElementById("introSplash");
+  splash.classList.add("fade");
+  setTimeout(() => {
+    splash.style.display = "none";
+    // Übergabe: der Punkt aus dem Intro "landet" im Logo
+    const i = document.querySelector(".logo .i");
+    if (i) { i.classList.remove("drop"); void i.offsetWidth; i.classList.add("drop"); }
+  }, 650);
+}
+(function () {
+  if (sessionStorage.getItem("listo-intro-seen")) return;
+  sessionStorage.setItem("listo-intro-seen", "1");
+  const splash = document.getElementById("introSplash");
+  const video = document.getElementById("introVideo");
+  splash.style.display = "flex";
+  video.onended = endIntro;
+  const p = video.play();
+  if (p) p.catch(endIntro); // Autoplay blockiert? Dann gar nicht erst zeigen.
+})();
+
+// Demo-Produkt-Wechsler: Tab klicken -> anderer Beispiel-Chat (Animation spielt beim ersten Zeigen)
+function showDemo(id, tab) {
+  document.querySelectorAll(".demo-chat").forEach((c) => c.classList.toggle("active", c.dataset.demo === id));
+  document.querySelectorAll(".demo-tab").forEach((t) => t.classList.toggle("active", t === tab));
+}
+
+// Produkt-Popup: Hover/Tipp auf ein Foto zeigt das Produkt groß + Geschichte
+(function () {
+  const pops = {};
+  document.querySelectorAll(".card-pop").forEach((p) => { pops[p.dataset.popId] = p; });
+  if (!Object.keys(pops).length) return;
+  let active = null;
+
+  function place(pop, img) {
+    const r = img.getBoundingClientRect();
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    let left = r.right + 14;
+    if (left + pw > innerWidth - 8) left = r.left - pw - 14;
+    if (left < 8) left = Math.max(8, Math.min((innerWidth - pw) / 2, innerWidth - pw - 8));
+    const top = Math.max(10, Math.min(r.top + r.height / 2 - ph / 2, innerHeight - ph - 10));
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+  }
+  function show(img) {
+    const pop = pops[img.dataset.pop];
+    if (!pop) return;
+    if (active && active !== pop) hide();
+    // Bei der Karte das große Bild auf die gehoverte Seite (Vorder-/Rückseite) setzen
+    if (img.dataset.pop === "card") document.getElementById("cardPopImg").src = img.src;
+    pop.classList.add("show");
+    pop.setAttribute("aria-hidden", "false");
+    active = pop;
+    place(pop, img);
+    const big = pop.querySelector("img");
+    if (big && !big.complete) big.onload = () => active === pop && place(pop, img);
+  }
+  function hide() {
+    if (!active) return;
+    active.classList.remove("show");
+    active.setAttribute("aria-hidden", "true");
+    active = null;
+  }
+
+  document.querySelectorAll("img[data-pop]").forEach((img) => {
+    img.addEventListener("mouseenter", () => show(img));
+    img.addEventListener("mouseleave", hide);
+    img.addEventListener("click", () => (active ? hide() : show(img))); // Touch-Geräte
+  });
+  addEventListener("scroll", () => { if (active) hide(); }, { passive: true });
+})();
+
+// Cookiefreier Pageview (keine IP, kein Profil — siehe Datenschutz)
+fetch("/api/event", {
+  method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+  body: JSON.stringify({ path: location.pathname, ref: document.referrer, lang: navigator.language }),
+}).catch(() => {});
+</script>
+
+<script src="i18n-admin.js?v=1"></script>
+<script src="listo-fx.js?v=2"></script>
+</body>
+</html>

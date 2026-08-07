@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide — Listo</title>
+<meta name="description" content="Step by step from zero to your first eBay listing with Listo — account, eBay, Telegram, first photo.">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css?v=15">
+<style>
+.guide-hero { text-align: center; max-width: 640px; margin: 0 auto; padding: 110px 24px 16px; }
+.guide-hero h1 { font-size: clamp(34px, 5vw, 52px); font-weight: 700; letter-spacing: -0.02em; margin: 14px 0 14px; }
+.guide-hero .sub { color: var(--text-2); font-size: 17px; line-height: 1.6; }
+.gstep { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; max-width: 880px; margin: 0 auto; padding: 44px 24px; }
+.gstep.flip .gtext { order: 2; }
+@media (max-width: 760px) { .gstep { grid-template-columns: 1fr; gap: 24px; } .gstep.flip .gtext { order: 0; } }
+.gtext .step-num { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.04em; }
+.gtext h2 { font-size: 27px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+.gtext p { font-size: 15.5px; color: var(--text-2); line-height: 1.65; }
+.mock {
+  background: var(--bg); border: 1px solid rgba(128,128,128,0.22); border-radius: 22px;
+  padding: 22px; box-shadow: 0 18px 48px rgba(0,0,0,0.10); max-width: 360px; margin: 0 auto; width: 100%;
+}
+.mock .mock-bar { display: flex; gap: 5px; margin-bottom: 14px; }
+.mock .mock-bar span { width: 9px; height: 9px; border-radius: 50%; background: rgba(128,128,128,0.25); }
+.mock h4 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.mock .mock-btn {
+  display: block; width: 100%; text-align: center; background: var(--accent); color: #fff;
+  font-weight: 600; font-size: 14.5px; border: none; border-radius: 11px; padding: 12px; margin-top: 12px;
+}
+.mock .mock-input {
+  width: 100%; box-sizing: border-box; font-size: 14px; padding: 11px 14px;
+  border: 1px solid rgba(128,128,128,0.35); border-radius: 10px; background: var(--bg-2); color: var(--text-3);
+}
+.mock ul.consent { list-style: none; padding: 0; margin: 10px 0 0; }
+.mock ul.consent li { font-size: 13.5px; color: var(--text-2); padding: 7px 0; border-bottom: 1px solid rgba(128,128,128,0.14); line-height: 1.5; }
+.mock ul.consent li:last-child { border-bottom: none; }
+.chat.guide { margin: 0 auto; max-width: 360px; }
+.btn-explain { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+.btn-explain .row { display: flex; gap: 14px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(128,128,128,0.16); }
+.btn-explain .row:last-child { border-bottom: none; }
+.btn-explain .chip { flex-shrink: 0; font-size: 13px; padding: 5px 12px; }
+.btn-explain .row p { font-size: 14.5px; color: var(--text-2); margin: 0; line-height: 1.55; }
+[data-theme="dark"] .btn-explain .chip { background: #2c2c2e; border-color: rgba(255,255,255,0.18); color: var(--text-2); }
+.guide-cta { text-align: center; padding: 64px 24px 96px; }
+.guide-cta h2 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="index.html" aria-label="Listo">l<span class="i" onclick="event.preventDefault();event.stopPropagation();this.classList.remove('drop');void this.offsetWidth;this.classList.add('drop');">ı</span>sto</a>
+    <div class="nav-links">
+      <a href="index.html" data-i18n="nav.back">Startseite</a>
+      <a class="btn small" href="onboarding.html" data-i18n="nav.cta">Kostenlos starten</a>
+      <div class="nav-controls">
+        <select class="lang-select" id="lang" onchange="setLang(this.value)" aria-label="Sprache wählen">
+          <option value="de">🇩🇪 DE</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="it">🇮🇹 IT</option>
+          <option value="fr">🇫🇷 FR</option>
+        </select>
+        <button class="theme-switch" id="themeBtn" onclick="toggleTheme()" aria-label="Hell/Dunkel umschalten" role="switch"><span class="knob"></span></button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header class="guide-hero">
+  <div class="eyebrow-pill" data-i18n="g.pill">Schritt-für-Schritt-Anleitung</div>
+  <h1 data-i18n="g.h1">Von null zum ersten Listing.</h1>
+  <p class="sub" data-i18n="g.sub">Die Einrichtung dauert keine 10 Minuten — und du machst sie genau einmal. Diese Seite zeigt dir jeden Schritt, so wie er bei dir aussehen wird.</p>
+</header>
+
+<!-- Schritt 1: Konto -->
+<section class="gstep">
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s1n">SCHRITT 1 · 1 MINUTE</div>
+    <h2 data-i18n="g.s1h">Konto erstellen.</h2>
+    <p data-i18n="g.s1p">Klick auf „Kostenlos starten" und gib deine E-Mail-Adresse ein — mehr nicht. Es gibt kein Passwort: Du bekommst einen Anmeldelink per Mail, ein Klick darauf und du bist drin. Bis Schritt 5 ist alles komplett kostenlos.</p>
+  </div>
+  <div class="mock">
+    <div class="mock-bar"><span></span><span></span><span></span></div>
+    <h4 data-i18n="g.m1h">Erstell dein Konto.</h4>
+    <div class="mock-input" data-i18n="g.m1ph">deine@email.de</div>
+    <div class="mock-btn" data-i18n="g.m1btn">Konto erstellen</div>
+    <p style="font-size:12.5px; color:var(--text-3); margin-top:10px;" data-i18n="g.m1note">🔒 Kein Passwort nötig — Anmeldung per E-Mail-Link.</p>
+  </div>
+</section>
+
+<!-- Schritt 2: eBay -->
+<section class="gstep flip">
+  <div class="mock">
+    <div class="mock-bar"><span></span><span></span><span></span></div>
+    <h4 data-i18n="g.m2h">Listo möchte sich mit deinem eBay-Konto verbinden</h4>
+    <ul class="consent">
+      <li data-i18n="g.m2a">✓ Angebote erstellen und verwalten — immer erst nach deinem ✅</li>
+      <li data-i18n="g.m2b">✗ Sieht nie dein eBay-Passwort</li>
+      <li data-i18n="g.m2c">✗ Sieht nie deine Zahlungsdaten</li>
+    </ul>
+    <div class="mock-btn" data-i18n="g.m2btn">Zustimmen und fortfahren</div>
+  </div>
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s2n">SCHRITT 2 · 30 SEKUNDEN</div>
+    <h2 data-i18n="g.s2h">eBay verbinden.</h2>
+    <p data-i18n="g.s2p">Klick auf „Mit eBay verbinden" — du landest auf der offiziellen eBay-Seite, loggst dich dort ganz normal ein und bestätigst den Zugriff. Du brauchst keinen Entwickler-Account und keine technischen Kenntnisse. Listo kann danach Angebote für dich erstellen — veröffentlicht wird trotzdem nie ohne deine Bestätigung.</p>
+  </div>
+</section>
+
+<!-- Schritt 3: Telegram -->
+<section class="gstep">
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s3n">SCHRITT 3 · 1 MINUTE</div>
+    <h2 data-i18n="g.s3h">Telegram verknüpfen.</h2>
+    <p data-i18n="g.s3p">Die Website zeigt dir deinen persönlichen Code (z.&nbsp;B. L-123456). Öffne den Listo-Bot über den Button, tippe auf „Start" und schick ihm den Code als Nachricht. Der Bot weiß ab jetzt, dass du es bist — und die Website springt automatisch weiter.</p>
+  </div>
+  <div class="chat guide">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="g.online">online</div></div>
+    </div>
+    <div class="bubble me">L-123456</div>
+    <div class="bubble bot"><span data-i18n="g.m3bot">✅ Verknüpft! Willkommen bei Listo. Eine Sache noch, dann kann's losgehen …</span></div>
+  </div>
+</section>
+
+<!-- Schritt 4: Adresse -->
+<section class="gstep flip">
+  <div class="chat guide">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="g.online2">online</div></div>
+    </div>
+    <div class="bubble bot"><span data-i18n="g.m4bot1">📦 Schick mir noch deine Versandadresse (Straße, PLZ, Ort) — daraus baue ich deine eBay-Versandeinstellungen.</span></div>
+    <div class="bubble me" data-i18n="g.m4me">Musterstraße 1, 80331 München</div>
+    <div class="bubble bot"><span data-i18n="g.m4bot2">✅ Alles eingerichtet! Versand, Zahlung und Rücknahme sind konfiguriert. Schick mir dein erstes Foto! 📸</span></div>
+  </div>
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s4n">SCHRITT 4 · EINMALIG</div>
+    <h2 data-i18n="g.s4h">Versandadresse angeben.</h2>
+    <p data-i18n="g.s4p">Der Bot fragt dich einmalig nach deiner Versandadresse. Daraus richtet Listo automatisch alles ein, was eBay zum Verkaufen verlangt: Versandart, Zahlungs- und Rücknahme-Einstellungen. Das erledigt sonst niemand für dich — hier passiert es nebenbei im Chat.</p>
+  </div>
+</section>
+
+<!-- Schritt 5: Foto schicken -->
+<section class="gstep">
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s5n">SCHRITT 5 · AB JETZT IMMER SO</div>
+    <h2 data-i18n="g.s5h">Fotos schicken. Fertig.</h2>
+    <p data-i18n="g.s5p">Fotografier deinen Artikel — gern mehrere Fotos als Album — und schick sie dem Bot. Dazu optional eine kurze Notiz mit deinem Wunschpreis oder Format. Rund 30 Sekunden später bekommst du die fertige Listing-Vorschau: Titel, Kategorie, alle eBay-Pflichtfelder, Marktpreis-Recherche und freigestelltes Foto.</p>
+    <div class="info-box" data-i18n="g.s5tips">💬 <strong>Beispiele für die Notiz:</strong> „Auktion ab 1 €" · „Sofortkauf 70 €, Vorschläge ab 50" · „10 Stück je 2,50 €" — oder gar nichts: dann recherchiert Listo den Marktpreis und schlägt vor.</div>
+  </div>
+  <div class="chat guide">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="g.online3">online</div></div>
+    </div>
+    <div class="bubble me">
+      <div class="photo-pair">
+        <figure><span class="holo-wrap" style="border-radius:6px;"><img src="assets/card-front.jpg" alt="PSA-Slab Vorderseite" style="height:108px;width:auto;border-radius:6px;display:block;"></span><figcaption data-i18n="g.front">Vorderseite</figcaption></figure>
+        <figure><span class="holo-wrap" style="border-radius:6px;"><img src="assets/card-back.jpg" alt="PSA-Slab Rückseite" style="height:108px;width:auto;border-radius:6px;display:block;"></span><figcaption data-i18n="g.back">Rückseite</figcaption></figure>
+      </div>
+      <div class="meta" data-i18n="g.m5cap">Sofortkauf 3.999 €, Vorschläge ab 3.500 €</div>
+    </div>
+    <div class="bubble bot">
+      <strong data-i18n="g.m5title">One Piece Luffy EB02-010 Dodgers Night PSA 10</strong>
+      <div class="meta" data-i18n="g.m5meta">📁 TCG Einzelkarten · 🏷 Graded — PSA 10, Zert. erkannt ✓<br>💶 3.999,00 € · 🤝 Preisvorschlag ab 3.500 €<br>📊 Markt: 3.400–4.900 €, Median 3.800 € · 🖼 freigestellt ✓</div>
+      <div class="chip-row"><span class="chip">✅</span><span class="chip" data-i18n="g.m5c2">✏️ Preis</span><span class="chip" data-i18n="g.m5c3">✏️ Titel</span><span class="chip">🔁</span><span class="chip">❌</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Die Knöpfe erklärt -->
+<section class="alt" style="padding: 56px 0;">
+  <h2 class="section-title" data-i18n="g.btnh">Deine Antwort-Knöpfe.</h2>
+  <p class="section-sub" data-i18n="g.btnsub">Unter jeder Vorschau — du hast immer die volle Kontrolle.</p>
+  <div class="btn-explain">
+    <div class="row"><span class="chip" data-i18n="g.b1c">✅ Hochladen</span><p data-i18n="g.b1p">Veröffentlicht das Listing auf eBay — erst jetzt geht es wirklich live. Du bekommst den eBay-Link direkt im Chat.</p></div>
+    <div class="row"><span class="chip" data-i18n="g.b2c">✏️ Preis</span><p data-i18n="g.b2p">Eigenen Preis eintippen — dein Preis gewinnt immer gegen den Vorschlag.</p></div>
+    <div class="row"><span class="chip" data-i18n="g.b3c">✏️ Titel</span><p data-i18n="g.b3p">Titel anpassen, falls du eine bessere Formulierung hast.</p></div>
+    <div class="row"><span class="chip" data-i18n="g.b4c">🔁 Neu</span><p data-i18n="g.b4p">Vorschau neu erzeugen — z.&nbsp;B. wenn du noch eine Info in der Notiz ergänzt hast.</p></div>
+    <div class="row"><span class="chip" data-i18n="g.b5c">❌ Verwerfen</span><p data-i18n="g.b5p">Entwurf löschen — es wurde nichts veröffentlicht, nichts ist passiert.</p></div>
+  </div>
+  <p style="text-align:center; max-width:560px; margin: 28px auto 0; padding: 0 24px; font-size:14.5px; color:var(--text-2);" data-i18n="g.btnnote"><strong>Die wichtigste Regel:</strong> Ohne dein ✅ geht niemals etwas live. Listo bereitet vor — du entscheidest.</p>
+</section>
+
+<!-- Live -->
+<section class="gstep">
+  <div class="gtext">
+    <div class="step-num" data-i18n="g.s6n">DAS ERGEBNIS</div>
+    <h2 data-i18n="g.s6h">✅ gedrückt — live auf eBay.</h2>
+    <p data-i18n="g.s6p">Nach deinem ✅ lädt Listo die Fotos hoch und stellt das Angebot live — den Link bekommst du sofort im Chat. Und während es published, fotografierst du schon den nächsten Artikel. In den ersten 14 Tagen testest du alles kostenlos; zum Veröffentlichen wählst du dann einfach einen Plan auf der Website.</p>
+  </div>
+  <div class="chat guide">
+    <div class="chat-head">
+      <div class="chat-avatar">L</div>
+      <div><div class="name">Listo</div><div class="status" data-i18n="g.online4">online</div></div>
+    </div>
+    <div class="bubble bot"><span class="live" data-i18n="g.m6live">✅ Dein Listing ist live!</span><div class="meta">ebay.de/itm/2273838…</div></div>
+    <div class="bubble me" data-i18n="g.m6me">📸 [nächster Artikel]</div>
+  </div>
+</section>
+
+<div class="guide-cta">
+  <h2 data-i18n="g.ctah">Bereit? Das alles dauert keine 10 Minuten.</h2>
+  <a class="btn" href="onboarding.html" data-i18n="g.ctab">Jetzt kostenlos starten</a>
+</div>
+
+<footer>
+  <div class="inner">
+    <div data-i18n="foot.copy">© 2026 Listo · Made in Munich</div>
+    <div>
+      <a href="legal.html#impressum" data-i18n="foot.imprint">Impressum</a>
+      <a href="legal.html#datenschutz" data-i18n="foot.privacy">Datenschutz</a>
+      <a href="legal.html#agb" data-i18n="foot.terms">AGB</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const T = {
+en: {
+"nav.back":"Home","nav.cta":"Start for free",
+"g.pill":"Step-by-step guide","g.h1":"From zero to your first listing.","g.sub":"Setup takes less than 10 minutes — and you only do it once. This page shows you every step exactly as it will look for you.",
+"g.s1n":"STEP 1 · 1 MINUTE","g.s1h":"Create your account.","g.s1p":"Click \"Start for free\" and enter your email address — that's it. There is no password: you get a sign-in link by email, one click and you're in. Everything up to step 5 is completely free.",
+"g.m1h":"Create your account.","g.m1ph":"your@email.com","g.m1btn":"Create account","g.m1note":"🔒 No password needed — sign in via email link.",
+"g.s2n":"STEP 2 · 30 SECONDS","g.s2h":"Connect eBay.","g.s2p":"Click \"Connect with eBay\" — you land on the official eBay page, sign in as usual and approve the access. No developer account, no technical knowledge needed. Listo can then create listings for you — but never publishes without your confirmation.",
+"g.m2h":"Listo wants to connect to your eBay account","g.m2a":"✓ Create and manage listings — always only after your ✅","g.m2b":"✗ Never sees your eBay password","g.m2c":"✗ Never sees your payment details","g.m2btn":"Agree and continue",
+"g.s3n":"STEP 3 · 1 MINUTE","g.s3h":"Link Telegram.","g.s3p":"The website shows your personal code (e.g. L-123456). Open the Listo bot via the button, tap \"Start\" and send it the code as a message. From now on the bot knows it's you — and the website moves on automatically.",
+"g.online":"online","g.online2":"online","g.online3":"online","g.online4":"online",
+"g.m3bot":"✅ Linked! Welcome to Listo. One more thing, then we're ready …",
+"g.s4n":"STEP 4 · ONE TIME ONLY","g.s4h":"Provide your shipping address.","g.s4p":"The bot asks once for your shipping address. From it, Listo automatically sets up everything eBay requires for selling: shipping, payment and return settings. Nobody else does this for you — here it happens in the chat, on the side.",
+"g.m4bot1":"📦 Send me your shipping address (street, ZIP, city) — I'll build your eBay shipping settings from it.","g.m4me":"1 Sample Street, 80331 Munich","g.m4bot2":"✅ All set! Shipping, payment and returns are configured. Send me your first photo! 📸",
+"g.s5n":"STEP 5 · YOUR NEW ROUTINE","g.s5h":"Send photos. Done.","g.s5p":"Photograph your item — several photos as an album work great — and send them to the bot. Optionally add a short note with your price or format. About 30 seconds later you get the finished listing preview: title, category, every required eBay field, market price research and the cutout photo.",
+"g.s5tips":"💬 <strong>Example notes:</strong> \"Auction from €1\" · \"BIN €70, offers from 50\" · \"10 pieces at €2.50 each\" — or nothing at all: then Listo researches the market price and suggests one.",
+"g.front":"Front","g.back":"Back","g.m5cap":"Buy It Now €3,999, offers from €3,500",
+"g.m5title":"One Piece Luffy EB02-010 Dodgers Night PSA 10",
+"g.m5meta":"📁 TCG single cards · 🏷 Graded — PSA 10, cert detected ✓<br>💶 €3,999.00 · 🤝 Best Offer from €3,500<br>📊 Market: €3,400–4,900, median €3,800 · 🖼 background removed ✓",
+"g.m5c2":"✏️ Price","g.m5c3":"✏️ Title",
+"g.btnh":"Your reply buttons.","g.btnsub":"Under every preview — you're always in full control.",
+"g.b1c":"✅ Publish","g.b1p":"Publishes the listing on eBay — only now does it really go live. You get the eBay link right in the chat.",
+"g.b2c":"✏️ Price","g.b2p":"Type your own price — your price always beats the suggestion.",
+"g.b3c":"✏️ Title","g.b3p":"Adjust the title if you have a better wording.",
+"g.b4c":"🔁 Redo","g.b4p":"Regenerate the preview — e.g. after adding info to your note.",
+"g.b5c":"❌ Discard","g.b5p":"Deletes the draft — nothing was published, nothing happened.",
+"g.btnnote":"<strong>The most important rule:</strong> Nothing ever goes live without your ✅. Listo prepares — you decide.",
+"g.s6n":"THE RESULT","g.s6h":"✅ pressed — live on eBay.","g.s6p":"After your ✅, Listo uploads the photos and puts the listing live — you get the link instantly in the chat. And while it publishes, you're already photographing the next item. The first 14 days are a free test; to publish you simply pick a plan on the website.",
+"g.m6live":"✅ Your listing is live!","g.m6me":"📸 [next item]",
+"g.ctah":"Ready? All of this takes less than 10 minutes.","g.ctab":"Start for free now",
+"foot.copy":"© 2026 Listo · Made in Munich","foot.imprint":"Imprint","foot.privacy":"Privacy","foot.terms":"Terms"
+},
+es: {
+"nav.back":"Inicio","nav.cta":"Empieza gratis",
+"g.pill":"Guía paso a paso","g.h1":"De cero a tu primer anuncio.","g.sub":"La configuración tarda menos de 10 minutos — y solo la haces una vez. Esta página te muestra cada paso tal y como lo verás tú.",
+"g.s1n":"PASO 1 · 1 MINUTO","g.s1h":"Crea tu cuenta.","g.s1p":"Haz clic en «Empieza gratis» e introduce tu e-mail — nada más. No hay contraseña: recibes un enlace de acceso por correo, un clic y ya estás dentro. Todo hasta el paso 5 es completamente gratis.",
+"g.m1h":"Crea tu cuenta.","g.m1ph":"tu@email.com","g.m1btn":"Crear cuenta","g.m1note":"🔒 Sin contraseña — acceso por enlace de e-mail.",
+"g.s2n":"PASO 2 · 30 SEGUNDOS","g.s2h":"Conecta eBay.","g.s2p":"Haz clic en «Conectar con eBay» — llegas a la página oficial de eBay, inicias sesión como siempre y apruebas el acceso. Sin cuenta de desarrollador ni conocimientos técnicos. Listo podrá crear anuncios por ti — pero nunca publica sin tu confirmación.",
+"g.m2h":"Listo quiere conectarse a tu cuenta de eBay","g.m2a":"✓ Crear y gestionar anuncios — siempre solo tras tu ✅","g.m2b":"✗ Nunca ve tu contraseña de eBay","g.m2c":"✗ Nunca ve tus datos de pago","g.m2btn":"Aceptar y continuar",
+"g.s3n":"PASO 3 · 1 MINUTO","g.s3h":"Vincula Telegram.","g.s3p":"La web te muestra tu código personal (p. ej. L-123456). Abre el bot de Listo con el botón, pulsa «Start» y envíale el código como mensaje. Desde ese momento el bot sabe que eres tú — y la web avanza automáticamente.",
+"g.online":"en línea","g.online2":"en línea","g.online3":"en línea","g.online4":"en línea",
+"g.m3bot":"✅ ¡Vinculado! Bienvenido a Listo. Una cosa más y empezamos …",
+"g.s4n":"PASO 4 · SOLO UNA VEZ","g.s4h":"Indica tu dirección de envío.","g.s4p":"El bot te pide una sola vez tu dirección de envío. Con ella, Listo configura automáticamente todo lo que eBay exige para vender: envío, pago y devoluciones. Nadie más hace esto por ti — aquí ocurre de paso, en el chat.",
+"g.m4bot1":"📦 Envíame tu dirección de envío (calle, CP, ciudad) — con ella configuro tus ajustes de envío de eBay.","g.m4me":"Calle Ejemplo 1, 80331 Múnich","g.m4bot2":"✅ ¡Todo listo! Envío, pago y devoluciones configurados. ¡Mándame tu primera foto! 📸",
+"g.s5n":"PASO 5 · TU NUEVA RUTINA","g.s5h":"Envía fotos. Listo.","g.s5p":"Fotografía tu artículo — varias fotos como álbum funcionan genial — y envíaselas al bot. Opcionalmente añade una nota corta con tu precio o formato. Unos 30 segundos después recibes la vista previa terminada: título, categoría, todos los campos obligatorios de eBay, investigación de precios y la foto recortada.",
+"g.s5tips":"💬 <strong>Ejemplos de nota:</strong> «Subasta desde 1 €» · «Cómpralo ya 70 €, ofertas desde 50» · «10 unidades a 2,50 €» — o nada: entonces Listo investiga el precio de mercado y te propone uno.",
+"g.front":"Anverso","g.back":"Reverso","g.m5cap":"¡Cómpralo ya! 3.999 €, ofertas desde 3.500 €",
+"g.m5title":"One Piece Luffy EB02-010 Dodgers Night PSA 10",
+"g.m5meta":"📁 Cartas TCG · 🏷 Graduada — PSA 10, cert. detectado ✓<br>💶 3.999,00 € · 🤝 Mejor oferta desde 3.500 €<br>📊 Mercado: 3.400–4.900 €, mediana 3.800 € · 🖼 fondo eliminado ✓",
+"g.m5c2":"✏️ Precio","g.m5c3":"✏️ Título",
+"g.btnh":"Tus botones de respuesta.","g.btnsub":"Bajo cada vista previa — siempre tienes el control total.",
+"g.b1c":"✅ Publicar","g.b1p":"Publica el anuncio en eBay — solo ahora se pone en línea de verdad. Recibes el enlace de eBay directamente en el chat.",
+"g.b2c":"✏️ Precio","g.b2p":"Escribe tu propio precio — tu precio siempre gana a la sugerencia.",
+"g.b3c":"✏️ Título","g.b3p":"Ajusta el título si tienes una formulación mejor.",
+"g.b4c":"🔁 Repetir","g.b4p":"Regenera la vista previa — p. ej. tras añadir información a tu nota.",
+"g.b5c":"❌ Descartar","g.b5p":"Borra el borrador — no se publicó nada, no pasó nada.",
+"g.btnnote":"<strong>La regla más importante:</strong> Nada se publica jamás sin tu ✅. Listo prepara — tú decides.",
+"g.s6n":"EL RESULTADO","g.s6h":"✅ pulsado — en línea en eBay.","g.s6p":"Tras tu ✅, Listo sube las fotos y publica el anuncio — recibes el enlace al instante en el chat. Y mientras se publica, ya estás fotografiando el siguiente artículo. Los primeros 14 días pruebas todo gratis; para publicar simplemente eliges un plan en la web.",
+"g.m6live":"✅ ¡Tu anuncio está en línea!","g.m6me":"📸 [siguiente artículo]",
+"g.ctah":"¿Listo? Todo esto tarda menos de 10 minutos.","g.ctab":"Empieza gratis ahora",
+"foot.copy":"© 2026 Listo · Hecho en Múnich","foot.imprint":"Aviso legal","foot.privacy":"Privacidad","foot.terms":"Condiciones"
+},
+it: {
+"nav.back":"Home","nav.cta":"Inizia gratis",
+"g.pill":"Guida passo dopo passo","g.h1":"Da zero al tuo primo annuncio.","g.sub":"La configurazione richiede meno di 10 minuti — e la fai una volta sola. Questa pagina ti mostra ogni passaggio esattamente come lo vedrai tu.",
+"g.s1n":"PASSO 1 · 1 MINUTO","g.s1h":"Crea il tuo account.","g.s1p":"Clicca su «Inizia gratis» e inserisci la tua e-mail — nient'altro. Non c'è password: ricevi un link di accesso via mail, un clic e sei dentro. Fino al passo 5 è tutto completamente gratuito.",
+"g.m1h":"Crea il tuo account.","g.m1ph":"tua@email.com","g.m1btn":"Crea account","g.m1note":"🔒 Nessuna password — accesso tramite link e-mail.",
+"g.s2n":"PASSO 2 · 30 SECONDI","g.s2h":"Collega eBay.","g.s2p":"Clicca su «Collega con eBay» — arrivi sulla pagina ufficiale di eBay, accedi come al solito e approvi l'accesso. Nessun account sviluppatore, nessuna conoscenza tecnica. Listo potrà creare annunci per te — ma non pubblica mai senza la tua conferma.",
+"g.m2h":"Listo vuole collegarsi al tuo account eBay","g.m2a":"✓ Creare e gestire annunci — sempre solo dopo il tuo ✅","g.m2b":"✗ Non vede mai la tua password eBay","g.m2c":"✗ Non vede mai i tuoi dati di pagamento","g.m2btn":"Accetta e continua",
+"g.s3n":"PASSO 3 · 1 MINUTO","g.s3h":"Collega Telegram.","g.s3p":"Il sito ti mostra il tuo codice personale (es. L-123456). Apri il bot Listo con il pulsante, tocca «Start» e inviagli il codice come messaggio. Da quel momento il bot sa che sei tu — e il sito prosegue automaticamente.",
+"g.online":"online","g.online2":"online","g.online3":"online","g.online4":"online",
+"g.m3bot":"✅ Collegato! Benvenuto su Listo. Un'ultima cosa e si parte …",
+"g.s4n":"PASSO 4 · UNA VOLTA SOLA","g.s4h":"Indica il tuo indirizzo di spedizione.","g.s4p":"Il bot ti chiede una sola volta il tuo indirizzo di spedizione. Da lì Listo configura automaticamente tutto ciò che eBay richiede per vendere: spedizione, pagamento e resi. Nessun altro lo fa per te — qui succede in chat, senza pensarci.",
+"g.m4bot1":"📦 Mandami il tuo indirizzo di spedizione (via, CAP, città) — da lì costruisco le tue impostazioni di spedizione eBay.","g.m4me":"Via Esempio 1, 80331 Monaco","g.m4bot2":"✅ Tutto pronto! Spedizione, pagamento e resi configurati. Mandami la tua prima foto! 📸",
+"g.s5n":"PASSO 5 · LA TUA NUOVA ROUTINE","g.s5h":"Invia foto. Fatto.","g.s5p":"Fotografa il tuo articolo — più foto come album vanno benissimo — e inviale al bot. In più, se vuoi, una breve nota con prezzo o formato. Circa 30 secondi dopo ricevi l'anteprima completa: titolo, categoria, tutti i campi obbligatori di eBay, ricerca dei prezzi di mercato e foto scontornata.",
+"g.s5tips":"💬 <strong>Esempi di nota:</strong> «Asta da 1 €» · «Compralo Subito 70 €, proposte da 50» · «10 pezzi a 2,50 €» — oppure niente: allora Listo ricerca il prezzo di mercato e te lo propone.",
+"g.front":"Fronte","g.back":"Retro","g.m5cap":"Compralo Subito 3.999 €, proposte da 3.500 €",
+"g.m5title":"One Piece Luffy EB02-010 Dodgers Night PSA 10",
+"g.m5meta":"📁 Carte TCG · 🏷 Gradata — PSA 10, cert. rilevato ✓<br>💶 3.999,00 € · 🤝 Proposta d'acquisto da 3.500 €<br>📊 Mercato: 3.400–4.900 €, mediana 3.800 € · 🖼 scontornato ✓",
+"g.m5c2":"✏️ Prezzo","g.m5c3":"✏️ Titolo",
+"g.btnh":"I tuoi pulsanti di risposta.","g.btnsub":"Sotto ogni anteprima — il controllo è sempre tutto tuo.",
+"g.b1c":"✅ Pubblica","g.b1p":"Pubblica l'annuncio su eBay — solo ora va davvero online. Ricevi il link eBay direttamente in chat.",
+"g.b2c":"✏️ Prezzo","g.b2p":"Digita il tuo prezzo — il tuo prezzo vince sempre sul suggerimento.",
+"g.b3c":"✏️ Titolo","g.b3p":"Modifica il titolo se hai una formulazione migliore.",
+"g.b4c":"🔁 Rigenera","g.b4p":"Rigenera l'anteprima — ad es. dopo aver aggiunto un'informazione alla nota.",
+"g.b5c":"❌ Scarta","g.b5p":"Elimina la bozza — non è stato pubblicato nulla, non è successo nulla.",
+"g.btnnote":"<strong>La regola più importante:</strong> Nulla va mai online senza il tuo ✅. Listo prepara — tu decidi.",
+"g.s6n":"IL RISULTATO","g.s6h":"✅ premuto — online su eBay.","g.s6p":"Dopo il tuo ✅, Listo carica le foto e mette l'annuncio online — ricevi subito il link in chat. E mentre si pubblica, stai già fotografando il prossimo articolo. I primi 14 giorni provi tutto gratis; per pubblicare scegli semplicemente un piano sul sito.",
+"g.m6live":"✅ Il tuo annuncio è online!","g.m6me":"📸 [prossimo articolo]",
+"g.ctah":"Pronto? Tutto questo richiede meno di 10 minuti.","g.ctab":"Inizia gratis ora",
+"foot.copy":"© 2026 Listo · Fatto a Monaco","foot.imprint":"Note legali","foot.privacy":"Privacy","foot.terms":"Termini"
+},
+fr: {
+"nav.back":"Accueil","nav.cta":"Commencer gratuitement",
+"g.pill":"Guide pas à pas","g.h1":"De zéro à votre première annonce.","g.sub":"La configuration prend moins de 10 minutes — et vous ne la faites qu'une seule fois. Cette page vous montre chaque étape exactement comme elle apparaîtra chez vous.",
+"g.s1n":"ÉTAPE 1 · 1 MINUTE","g.s1h":"Créez votre compte.","g.s1p":"Cliquez sur « Commencer gratuitement » et saisissez votre e-mail — c'est tout. Pas de mot de passe : vous recevez un lien de connexion par e-mail, un clic et vous êtes connecté. Tout est entièrement gratuit jusqu'à l'étape 5.",
+"g.m1h":"Créez votre compte.","g.m1ph":"votre@email.com","g.m1btn":"Créer le compte","g.m1note":"🔒 Pas de mot de passe — connexion par lien e-mail.",
+"g.s2n":"ÉTAPE 2 · 30 SECONDES","g.s2h":"Connectez eBay.","g.s2p":"Cliquez sur « Connecter avec eBay » — vous arrivez sur la page officielle d'eBay, vous vous connectez normalement et approuvez l'accès. Pas de compte développeur, aucune connaissance technique. Listo pourra ensuite créer des annonces pour vous — mais ne publie jamais sans votre confirmation.",
+"g.m2h":"Listo souhaite se connecter à votre compte eBay","g.m2a":"✓ Créer et gérer des annonces — toujours après votre ✅","g.m2b":"✗ Ne voit jamais votre mot de passe eBay","g.m2c":"✗ Ne voit jamais vos données de paiement","g.m2btn":"Accepter et continuer",
+"g.s3n":"ÉTAPE 3 · 1 MINUTE","g.s3h":"Liez Telegram.","g.s3p":"Le site affiche votre code personnel (p. ex. L-123456). Ouvrez le bot Listo via le bouton, appuyez sur « Start » et envoyez-lui le code en message. Le bot sait désormais que c'est vous — et le site avance automatiquement.",
+"g.online":"en ligne","g.online2":"en ligne","g.online3":"en ligne","g.online4":"en ligne",
+"g.m3bot":"✅ Lié ! Bienvenue chez Listo. Encore une chose et c'est parti …",
+"g.s4n":"ÉTAPE 4 · UNE SEULE FOIS","g.s4h":"Indiquez votre adresse d'expédition.","g.s4p":"Le bot vous demande une seule fois votre adresse d'expédition. À partir de là, Listo configure automatiquement tout ce qu'eBay exige pour vendre : expédition, paiement et retours. Personne d'autre ne le fait pour vous — ici, ça se passe dans le chat, sans y penser.",
+"g.m4bot1":"📦 Envoyez-moi votre adresse d'expédition (rue, code postal, ville) — j'en construis vos paramètres d'expédition eBay.","g.m4me":"1 rue de l'Exemple, 80331 Munich","g.m4bot2":"✅ Tout est prêt ! Expédition, paiement et retours configurés. Envoyez-moi votre première photo ! 📸",
+"g.s5n":"ÉTAPE 5 · VOTRE NOUVELLE ROUTINE","g.s5h":"Envoyez des photos. Terminé.","g.s5p":"Photographiez votre article — plusieurs photos en album, c'est parfait — et envoyez-les au bot. Ajoutez si vous voulez une courte note avec votre prix ou le format. Environ 30 secondes plus tard, vous recevez l'aperçu complet : titre, catégorie, tous les champs obligatoires d'eBay, étude des prix du marché et photo détourée.",
+"g.s5tips":"💬 <strong>Exemples de note :</strong> « Enchère dès 1 € » · « Achat immédiat 70 €, offres dès 50 » · « 10 pièces à 2,50 € » — ou rien du tout : Listo étudie alors le prix du marché et vous en propose un.",
+"g.front":"Recto","g.back":"Verso","g.m5cap":"Achat immédiat 3 999 €, offres dès 3 500 €",
+"g.m5title":"One Piece Luffy EB02-010 Dodgers Night PSA 10",
+"g.m5meta":"📁 Cartes TCG · 🏷 Gradée — PSA 10, cert. détecté ✓<br>💶 3 999,00 € · 🤝 Meilleure offre dès 3 500 €<br>📊 Marché : 3 400–4 900 €, médiane 3 800 € · 🖼 détouré ✓",
+"g.m5c2":"✏️ Prix","g.m5c3":"✏️ Titre",
+"g.btnh":"Vos boutons de réponse.","g.btnsub":"Sous chaque aperçu — vous gardez toujours le contrôle total.",
+"g.b1c":"✅ Publier","g.b1p":"Publie l'annonce sur eBay — c'est seulement maintenant qu'elle est vraiment en ligne. Vous recevez le lien eBay directement dans le chat.",
+"g.b2c":"✏️ Prix","g.b2p":"Saisissez votre propre prix — votre prix gagne toujours sur la suggestion.",
+"g.b3c":"✏️ Titre","g.b3p":"Ajustez le titre si vous avez une meilleure formulation.",
+"g.b4c":"🔁 Refaire","g.b4p":"Régénère l'aperçu — p. ex. après avoir ajouté une info à votre note.",
+"g.b5c":"❌ Abandonner","g.b5p":"Supprime le brouillon — rien n'a été publié, rien ne s'est passé.",
+"g.btnnote":"<strong>La règle la plus importante :</strong> Rien n'est jamais publié sans votre ✅. Listo prépare — vous décidez.",
+"g.s6n":"LE RÉSULTAT","g.s6h":"✅ appuyé — en ligne sur eBay.","g.s6p":"Après votre ✅, Listo téléverse les photos et met l'annonce en ligne — vous recevez le lien instantanément dans le chat. Et pendant la publication, vous photographiez déjà l'article suivant. Les 14 premiers jours, vous testez tout gratuitement ; pour publier, choisissez simplement un forfait sur le site.",
+"g.m6live":"✅ Votre annonce est en ligne !","g.m6me":"📸 [article suivant]",
+"g.ctah":"Prêt ? Tout cela prend moins de 10 minutes.","g.ctab":"Commencer gratuitement",
+"foot.copy":"© 2026 Listo · Fait à Munich","foot.imprint":"Mentions légales","foot.privacy":"Confidentialité","foot.terms":"CGV"
+}
+};
+const de = {};
+document.querySelectorAll("[data-i18n]").forEach(el => { de[el.dataset.i18n] = el.innerHTML; });
+document.querySelectorAll("[data-i18n-ph]").forEach(el => { de[el.dataset.i18nPh] = el.placeholder; });
+T.de = de;
+let L = de;
+
+function setLang(lang) {
+  L = T[lang] || T.de;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (L[el.dataset.i18n] !== undefined) el.innerHTML = L[el.dataset.i18n];
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    if (L[el.dataset.i18nPh] !== undefined) el.placeholder = L[el.dataset.i18nPh];
+  });
+  document.documentElement.lang = lang;
+  localStorage.setItem("listo-lang", lang);
+  document.getElementById("lang").value = lang;
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem("listo-theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+applyTheme(localStorage.getItem("listo-theme")
+  || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+setLang(localStorage.getItem("listo-lang") || "en");
+
+fetch("/api/event", {
+  method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+  body: JSON.stringify({ path: location.pathname, ref: document.referrer, lang: navigator.language }),
+}).catch(() => {});
+</script>
+<script src="i18n-admin.js?v=1"></script>
+<script src="listo-fx.js?v=2"></script>
+</body>
+</html>
