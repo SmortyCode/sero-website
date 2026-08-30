@@ -53,3 +53,10 @@ Zwei Fallen beim Prüfen:
 
 Duzen, keine Ausrufezeichen im Fließtext, kein Marketing-Superlativ.
 Nichts versprechen, was die App nicht hält.
+
+## Domain-Hinweis (15.08.2026)
+
+**seromunich.com (Apex)** ist die SERO-Landingpage auf Contabo (Repo
+`~/ebay-bot/landing/`), nicht mehr Shopify. Onboarding/Legal unter diesem
+Ordner laufen weiter über die App-Domain (`app.seromunich.com`), solange
+`LISTO_SITE_DIR` darauf zeigt.

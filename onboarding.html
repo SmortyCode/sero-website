@@ -346,7 +346,7 @@ async function doSignup() {
 
 function openEbayConsent() {
   document.getElementById("paste-area").style.display = "block";
-  window.open("/connect/ebay", "_blank");
+  window.open("/connect/ebay?next=" + encodeURIComponent("/onboarding.html"), "_blank");
 }
 
 async function submitEbayUrl() {

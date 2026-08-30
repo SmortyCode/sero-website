@@ -133,6 +133,10 @@ async function requestCode() {
     err.style.display = "block";
     return;
   }
+  if (data.ok) {
+    window.location = "/app/";
+    return;
+  }
   err.style.display = "none";
   document.getElementById("sent-to").textContent = identifier;
   if (data.dev_code) {
